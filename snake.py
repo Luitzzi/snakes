@@ -15,7 +15,7 @@ INTRO_BG_COLOR = (50, 50, 50)
 
 # Init pygame
 pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
 
 # Snake
@@ -25,7 +25,7 @@ direction = (SEGMENT_SIZE, 0)
 
 # Food
 def spawn_food():
-    return random.randrange((0, WIDTH), (0, HEIGHT))
+    return (random.randrange(0, WIDTH), random.randrange(0, HEIGHT))
 
 
 food = spawn_food()
