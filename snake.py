@@ -23,9 +23,9 @@ snake = [(2,2),(2,3)]
 direction = (SEGMENT_SIZE,0)
 
 # Food
-def spawnFood():
+def spawn_food():
     return random.randrange((0, WIDTH),(0,HEIGHT))
-food = spawnFood()
+food = spawn_food()
 
 # Game logic
 running = True
@@ -47,14 +47,14 @@ while running:
                 snake.change_direction((SEGMENT_SIZE, 0))
 
     # Move snake
-    newHead = (snake[0][0] + direction[0], snake[0][1] + direction[1])
-    if newHead in snake or newHead[0] < 0  or newHead[0] >= WIDTH or newHead[1] < 0 or newHead[1] >= WIDTH
+    new_head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
+    if new_head in snake or new_head[0] < 0  or new_head[0] >= WIDTH or new_head[1] < 0 or new_head[1] >= WIDTH
         running = False
 
-    snake.insert(0, newHead)
+    snake.insert(0, new_head)
 
-    if newHead == food:
-        spawnFood()
+    if new_head == food:
+        spawn_food()
     else:
         snake.pop()
 
