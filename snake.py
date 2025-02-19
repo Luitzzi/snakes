@@ -25,6 +25,7 @@ direction = (SEGMENT_SIZE,0)
 # Food
 def spawnFood():
     return random.randrange((0, WIDTH),(0,HEIGHT))
+food = spawnFood()
 
 # Game logic
 running = True
@@ -53,6 +54,8 @@ while running:
     snake.insert(0, newHead)
 
     if newHead == food:
-
+        spawnFood()
     else:
         snake.pop()
+
+pygame.quit()
