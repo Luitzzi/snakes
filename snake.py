@@ -4,14 +4,14 @@ import random
 # General settings
 WIDTH = 8
 HEIGHT = 8
-SEGMENT_SIZE = 1;
+SEGMENT_SIZE = 1
 FPS = 10
 
 # Colors
-SNAKE_COLOR = (0,255,0)
-FOOD_COLOR = (255,0,0)
-BG_COLOR = (0,0,0)
-INTRO_BG_COLOR = (50,50,50)
+SNAKE_COLOR = (0, 255, 0)
+FOOD_COLOR = (255, 0, 0)
+BG_COLOR = (0, 0, 0)
+INTRO_BG_COLOR = (50, 50, 50)
 
 # Init pygame
 pygame.init()
@@ -19,12 +19,15 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 # Snake
-snake = [(2,2),(2,3)]
-direction = (SEGMENT_SIZE,0)
+snake = [(2, 2), (2, 3)]
+direction = (SEGMENT_SIZE, 0)
+
 
 # Food
 def spawn_food():
-    return random.randrange((0, WIDTH),(0,HEIGHT))
+    return random.randrange((0, WIDTH), (0, HEIGHT))
+
+
 food = spawn_food()
 
 # Game logic
@@ -48,7 +51,13 @@ while running:
 
     # Move snake
     new_head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
-    if new_head in snake or new_head[0] < 0  or new_head[0] >= WIDTH or new_head[1] < 0 or new_head[1] >= WIDTH
+    if (
+        new_head in snake
+        or new_head[0] < 0
+        or new_head[0] >= WIDTH
+        or new_head[1] < 0
+        or new_head[1] >= WIDTH
+    ):
         running = False
 
     snake.insert(0, new_head)
