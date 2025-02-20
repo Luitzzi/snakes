@@ -15,7 +15,6 @@ class Snake:
 
     def draw(self, screen):
         for segment in self.body:
-            print("Drawing: x={}; y={}".format(segment[0], segment[1]))
             utils.draw_tile(screen, segment[0], segment[1], config.SNAKE_COLOR)
 
     def set_direction(self, new_direction):
