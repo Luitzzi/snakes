@@ -1,10 +1,11 @@
+from enum import Enum
 import pygame
 import random
 
 # General settings
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
-WIDTH = 116
+WIDTH = 12
 HEIGHT = 12
 TILE_SIZE = int(min(SCREEN_WIDTH / WIDTH, SCREEN_HEIGHT / HEIGHT))
 OFFSET_X = int((SCREEN_WIDTH - WIDTH * TILE_SIZE) / 2)
@@ -23,10 +24,6 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 
-# Snake
-snake = [(2, 2), (2, 3)]
-direction = (1, 0)
-
 
 # GUI
 def n_x(x):
@@ -42,8 +39,15 @@ def draw_tile(x, y, color):
 
 
 def draw_rect(x, y, w, h, color):
-    rect = pygame.Rect(x + OFFSET_X, y + OFFSET_Y, w, h)
+    rect = pygame.Rect(
+        x + OFFSET_X, y + OFFSET_Y, w, h
+    )  # n_x und n_y funktionen benutzen. Wobei ich die eher calc_x nennen würd
     pygame.draw.rect(screen, color, rect)
+
+
+# Snake
+snake = [(WIDTH / 2, HEIGHT / 2), (WIDTH / 2 - 1, HEIGHT / 2)]
+direction = (1, 0)  # Start movement: right
 
 
 # Food
@@ -65,40 +69,42 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and direction != (0, 1):
-                snake.change_direction((0, -1))
+                direction = (0, -1)
             elif event.key == pygame.K_DOWN and direction != (0, -1):
-                snake.change_direction((0, 1))
+                direction = (0, 1)
             elif event.key == pygame.K_LEFT and direction != (1, 0):
-                snake.change_direction((-1, 0))
+                direction = (-1, 0)
             elif event.key == pygame.K_RIGHT and direction != (-1, 0):
-                snake.change_direction((1, 0))
+                direction = (1, 0)
 
     # Move snake
-    """
     new_head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
     if (
         new_head in snake
         or new_head[0] < 0
         or new_head[0] >= WIDTH
         or new_head[1] < 0
-        or new_head[1] >= WIDTH
+        or new_head[1] >= HEIGHT
     ):
         running = False
-        pass
+
+    snake.insert(0, new_head)
 
     if new_head == food:
-        spawn_food()
+        food = spawn_food()
     else:
         snake.pop()
 
-    """
+    # Draw elements
+    for snake_segment in snake:
+        draw_tile(snake_segment[0], snake_segment[1], SNAKE_COLOR)
 
-    draw_tile(1, 1, SNAKE_COLOR)
-    draw_tile(4, 4, FOOD_COLOR)
-    # snake.insert(0, new_head)
+    draw_tile(food[0], food[1], FOOD_COLOR)
 
     pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(
+        10
+    )  # limits FPS to 60 -> Auf 10 gesetzt sonst ist ne schlange auf speed D:
 
 pygame.quit()
