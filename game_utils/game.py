@@ -1,8 +1,10 @@
 import pygame
 import config
-from game_utils.snake import Snake
+from game_utils.snake_logic import SnakeLogic
 from game_utils.direction import Direction
-from game_utils.food import Food
+from game_utils.food_logic import FoodLogic
+from sprites.food_sprite import FoodSprite
+from sprites.snake_sprite import SnakeSprite
 
 
 class Game:
@@ -13,8 +15,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.snake = Snake()
-        self.food = Food()
+        self.snake_logic = SnakeLogic()
+        self.snake_sprite = SnakeSprite(self.snake_logic)
+        self.food_logic = FoodLogic()
+        self.food_sprite = FoodSprite(self.food_logic)
 
     def run(self):
         self.screen.fill(config.BG_COLOR)
@@ -34,22 +38,22 @@ class Game:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.snake.set_direction(Direction.left)
+                    self.snake_logic.set_direction(Direction.left)
                 elif event.key == pygame.K_RIGHT:
-                    self.snake.set_direction(Direction.right)
+                    self.snake_logic.set_direction(Direction.right)
                 elif event.key == pygame.K_UP:
-                    self.snake.set_direction(Direction.up)
+                    self.snake_logic.set_direction(Direction.up)
                 elif event.key == pygame.K_DOWN:
-                    self.snake.set_direction(Direction.down)
+                    self.snake_logic.set_direction(Direction.down)
 
     def __update_state(self):
-        self.snake.move()
+        self.snake_logic.move()
         self.__handle_eating()
 
     def __is_state_valid(self):
-        new_head = self.snake.body[0]
+        new_head = self.snake_logic.body[0]
         if (
-            new_head in self.snake.body[1:]
+            new_head in self.snake_logic.body[1:]
             or new_head[0] < 0
             or new_head[0] >= config.WIDTH
             or new_head[1] < 0
@@ -58,14 +62,14 @@ class Game:
             self.running = False
 
     def __draw(self):
-        self.snake.draw(self.screen)
-        self.food.draw(self.screen)
+        self.snake_sprite.draw(self.screen)
+        self.food_sprite.draw(self.screen)
 
     # Helper methods (not called from the run method directly)
 
     def __handle_eating(self):
-        new_head = self.snake.body[0]
-        if new_head == self.food.location:
-            self.food.respawn()
+        new_head = self.snake_logic.body[0]
+        if new_head == self.food_logic.location:
+            self.food_logic.respawn(self.snake_logic.body)
         else:
-            self.snake.body.pop()
+            self.snake_logic.body.pop()

@@ -1,21 +1,14 @@
 import config
-import utils
 from game_utils.direction import Direction
 
 
-class Snake:
-    default_direction = Direction.right
+class SnakeLogic:
+    default_direction = config.SNAKE_DEFAULT_DIRECTION
+    starting_position = config.SNAKE_STARTING_POSITION
 
     def __init__(self):
-        self.body = [
-            (config.WIDTH // 2, config.HEIGHT // 2),
-            (config.WIDTH // 2 - 1, config.HEIGHT // 2),
-        ]
+        self.body = self.starting_position
         self.direction = self.default_direction
-
-    def draw(self, screen):
-        for segment in self.body:
-            utils.draw_tile(screen, segment[0], segment[1], config.SNAKE_COLOR)
 
     def set_direction(self, new_direction):
         match new_direction:

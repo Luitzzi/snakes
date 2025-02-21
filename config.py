@@ -1,7 +1,8 @@
 import pygame
+from game_utils.direction import Direction
 
 # General settings
-FPS = 10
+FPS = 5
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 WIDTH = 12
@@ -16,3 +17,7 @@ SNAKE_COLOR = (50, 100, 150)
 FOOD_COLOR = (200, 60, 40)
 FIELD_COLOR = (200, 220, 150)
 BG_COLOR = (50, 50, 70)
+
+# Game starting position
+SNAKE_STARTING_POSITION = [(WIDTH // 2, HEIGHT // 2), (WIDTH // 2 + 1, HEIGHT // 2)]
+SNAKE_DEFAULT_DIRECTION = Direction.right
