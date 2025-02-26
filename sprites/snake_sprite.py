@@ -3,7 +3,6 @@ import config
 
 
 class SnakeSprite(pygame.sprite.Sprite):
-
     def __init__(self, gui, snake_logic):
         super().__init__()
         self.gui = gui

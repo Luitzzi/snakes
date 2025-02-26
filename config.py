@@ -6,6 +6,10 @@ FPS = 5
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 
+# Sprites
+SPRITE_PATH = "./assets/sprites/"
+SPRITE_FILE_ENDING = ".png"
+
 # Colors
 SNAKE_COLOR = (50, 100, 150)
 FOOD_COLOR = (200, 60, 40)
