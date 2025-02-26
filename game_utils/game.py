@@ -1,11 +1,11 @@
 import pygame
+
 import config
 from game_utils.snake_logic import SnakeLogic
 from game_utils.direction import Direction
 from game_utils.food_logic import FoodLogic
 from sprites.food_sprite import FoodSprite
 from sprites.snake_sprite import SnakeSprite
-
 
 class Game:
     def __init__(self):
@@ -14,6 +14,7 @@ class Game:
         )
         self.clock = pygame.time.Clock()
         self.running = True
+        self.start_time = None
 
         self.snake_logic = SnakeLogic()
         self.snake_sprite = SnakeSprite(self.snake_logic)
@@ -22,15 +23,28 @@ class Game:
 
     def run(self):
         self.screen.fill(config.BG_COLOR)
+        self.start_time = pygame.time.get_ticks()
         while self.running:
             pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
             self.__handle_events()
             self.__update_state()
             self.__is_state_valid()
             self.__draw()
+            print(self.get_time_since_start())
             pygame.display.flip()
             self.clock.tick(config.FPS)
         pygame.quit()
+
+    def get_time_since_start(self):
+        '''
+        Returns the time until the game-loop, therefore the game started in milliseconds
+        :return: int representing milliseconds
+        '''
+        if self.start_time == None:
+            return None
+        else:
+            running_time_milis = pygame.time.get_ticks() - self.start_time
+            return running_time_milis // 1000
 
     def __handle_events(self):
         for event in pygame.event.get():
@@ -73,3 +87,4 @@ class Game:
             self.food_logic.respawn(self.snake_logic.body)
         else:
             self.snake_logic.body.pop()
+
