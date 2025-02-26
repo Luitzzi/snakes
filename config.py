@@ -9,6 +9,7 @@ SCREEN_HEIGHT = 400
 # Sprites
 SPRITE_PATH = "./assets/sprites/"
 SPRITE_FILE_ENDING = ".png"
+SPRITE_SIZE = 16  # 16px x 16px
 
 # Colors
 SNAKE_COLOR = (50, 100, 150)
