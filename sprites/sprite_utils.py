@@ -3,7 +3,7 @@ import os
 import pygame
 
 import config
-from enums import Direction, Wiggle
+from game_utils.direction import Direction
 
 
 class SpriteVariant:
@@ -18,7 +18,7 @@ class Sprite:
     def __init__(self, input_sprite):
         sprite = pygame.Surface.copy(input_sprite)
         self.left = SpriteVariant(sprite)
-        sprite = pygame.transform.flip(sprite, False, True)
+        sprite = pygame.transform.flip(sprite, True, False)
         self.right = SpriteVariant(sprite)
 
 
@@ -68,7 +68,7 @@ def get_sprite_dir(direction, sprite_variant):
 
 
 def get_sprite_wiggle(wiggle, sprite):
-    if wiggle == Wiggle.right:
+    if wiggle == 1:
         return sprite.right
     else:
         return sprite.left

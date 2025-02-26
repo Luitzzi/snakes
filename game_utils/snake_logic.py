@@ -31,6 +31,9 @@ class SnakeLogic:
         self.new_direction = self.next_new_direction
         new_head = self.__calc_new_head()
         self.body.insert(0, new_head)
+        # change wiggle side
+        self.wiggle_offset = 1 - self.wiggle_offset
+        print(self.wiggle_offset)
         return new_head
 
     def __calc_new_head(self):
