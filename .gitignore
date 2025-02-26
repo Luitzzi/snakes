@@ -1,3 +1,5 @@
 __pycache__
+.venv
+.vscode
 assets/sprites/old
 my_test.py
