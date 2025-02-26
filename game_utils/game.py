@@ -6,8 +6,8 @@ from game_utils.snake_logic import SnakeLogic
 from game_utils.direction import Direction
 from game_utils.game_states import GameStates
 from game_utils.food_logic import FoodLogic
+from gui.drawers.snake_drawer import SnakeDrawer
 from sprites.food_sprite import FoodSprite
-from sprites.snake_sprite import SnakeSprite
 
 
 class Game:
@@ -23,7 +23,9 @@ class Game:
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
         )
         # Setup field settings
-        self.gui = GUI(field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
+        self.gui = GUI(
+            field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT
+        )
 
         # Setup game logic
         self.clock = pygame.time.Clock()
@@ -33,10 +35,14 @@ class Game:
         self.test_mode = False
 
         # Setup game elements
-        snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
+        snake_starting_position = config.calc_starting_position(
+            self.gui.field_width, self.gui.field_height
+        )
         self.snake_logic = SnakeLogic(snake_starting_position)
-        self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
-        self.food_logic = FoodLogic(snake_starting_position, self.gui.field_width, self.gui.field_height)
+        self.snake_drawer = SnakeDrawer(self.gui, self.snake_logic)
+        self.food_logic = FoodLogic(
+            snake_starting_position, self.gui.field_width, self.gui.field_height
+        )
         self.food_sprite = FoodSprite(self.gui, self.food_logic)
 
     def run(self):
@@ -153,8 +159,8 @@ class Game:
         else:
             return False
 
-    def _draw(self):
-        self.snake_sprite.draw(self.screen)
+    def __draw(self):
+        self.snake_drawer.draw(self.screen)
         self.food_sprite.draw(self.screen)
 
     #########

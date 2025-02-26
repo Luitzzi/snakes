@@ -3,7 +3,6 @@ import config
 
 
 class FoodSprite(pygame.sprite.Sprite):
-
     def __init__(self, gui, food_logic):
         super().__init__()
         self.gui = gui
@@ -15,4 +14,3 @@ class FoodSprite(pygame.sprite.Sprite):
         self.gui.draw_image(
             screen, self.image, self.food_logic.location[0], self.food_logic.location[1]
         )
-

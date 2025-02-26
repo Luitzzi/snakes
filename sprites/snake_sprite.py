@@ -1,13 +1,15 @@
-import pygame
-import config
+from sprites.sprite_utils import Sprite, SpriteVariant, load_spritesheet
 
 
-class SnakeSprite(pygame.sprite.Sprite):
-    def __init__(self, gui, snake_logic):
-        super().__init__()
-        self.gui = gui
-        self.snake_logic = snake_logic
-
-    def draw(self, screen):
-        for segment in self.snake_logic.body:
-            self.gui.draw_tile(screen, segment[0], segment[1], config.SNAKE_COLOR)
+class SnakeSprite:
+    def __init__(self):
+        sprites = load_spritesheet("snake")
+        self.head = Sprite(sprites[0][0])
+        self.tongue = Sprite(sprites[0][1])
+        self.mouth = SpriteVariant(sprites[0][2])
+        self.body = Sprite(sprites[1][0])
+        self.curve = SpriteVariant(sprites[1][1])
+        self.tail = Sprite(sprites[1][2])
+        self.eyelids = Sprite(sprites[2][0])
+        self.eyelids_smushed = SpriteVariant(sprites[2][1])
+        self.head_smushed = SpriteVariant(sprites[2][1])

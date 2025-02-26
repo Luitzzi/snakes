@@ -11,6 +11,7 @@ class SnakeLogic:
         self.direction = self.default_direction
         self.new_direction = self.default_direction
         self.next_new_direction = self.default_direction
+        self.wiggle_offset = 0  # set wiggle direction for head (left: 0, right: 1)
 
     def set_direction(self, direction):
         if self.direction == self.new_direction:

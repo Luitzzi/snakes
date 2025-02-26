@@ -27,3 +27,11 @@ def is_opposite_dir(direction1, direction2):
             return direction2 == Direction.NORTH
         case Direction.WEST:
             return direction2 == Direction.EAST
+
+
+class Wiggle(Enum):
+    left = 0
+    right = 1
+
+    def __getitem__(self, index):
+        return self.value[index]
