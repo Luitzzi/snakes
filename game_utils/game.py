@@ -26,27 +26,26 @@ class Game:
         self.start_time = pygame.time.get_ticks()
         while self.running:
             pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
-            self.__handle_events()
-            self.__update_state()
-            self.__is_state_valid()
-            self.__draw()
-            print(self.get_time_since_start())
+            self._handle_events()
+            self._update_state()
+            self._is_state_valid()
+            self._draw()
             pygame.display.flip()
             self.clock.tick(config.FPS)
         pygame.quit()
 
     def get_time_since_start(self):
-        '''
+        """
         Returns the time until the game-loop, therefore the game started in milliseconds
         :return: int representing milliseconds
-        '''
+        """
         if self.start_time == None:
             return None
         else:
             running_time_milis = pygame.time.get_ticks() - self.start_time
             return running_time_milis // 1000
 
-    def __handle_events(self):
+    def _handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -60,11 +59,11 @@ class Game:
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.snake_logic.set_direction(Direction.down)
 
-    def __update_state(self):
+    def _update_state(self):
         self.snake_logic.move()
-        self.__handle_eating()
+        self._handle_eating()
 
-    def __is_state_valid(self):
+    def _is_state_valid(self):
         new_head = self.snake_logic.body[0]
         if (
             new_head in self.snake_logic.body[1:]
@@ -75,13 +74,13 @@ class Game:
         ):
             self.running = False
 
-    def __draw(self):
+    def _draw(self):
         self.snake_sprite.draw(self.screen)
         self.food_sprite.draw(self.screen)
 
     # Helper methods (not called from the run method directly)
 
-    def __handle_eating(self):
+    def _handle_eating(self):
         new_head = self.snake_logic.body[0]
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)
