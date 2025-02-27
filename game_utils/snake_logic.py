@@ -26,8 +26,14 @@ class SnakeLogic:
                     self.direction = Direction.down
 
     def move(self):
+        """
+        Moves the snake in the direction that is saved in self.direction.
+        Return the position of the new_head for collision checking.
+        :return: new_head position
+        """
         new_head = self.__calc_new_head()
         self.body.insert(0, new_head)
+        return new_head
 
     def __calc_new_head(self):
         new_head = (
