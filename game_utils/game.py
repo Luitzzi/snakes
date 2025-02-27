@@ -26,26 +26,25 @@ class Game:
         self.start_time = pygame.time.get_ticks()
         while self.running:
             pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
-            self.__handle_events()
-            self.__update_state()
-            self.__is_state_valid()
-            self.__draw()
+            self._handle_events()
+            self._update_state()
+            self._draw()
             pygame.display.flip()
             self.clock.tick(config.FPS)
         pygame.quit()
 
     def get_time_since_start(self):
-        '''
+        """
         Returns the time until the game-loop, therefore the game started in milliseconds
         :return: int representing milliseconds
-        '''
+        """
         if self.start_time == None:
             return None
         else:
             running_time_milis = pygame.time.get_ticks() - self.start_time
             return running_time_milis // 1000
 
-    def __handle_events(self):
+    def _handle_events(self):
         new_direction = None
 
         for event in pygame.event.get():
@@ -63,12 +62,25 @@ class Game:
         if new_direction:
             self.snake_logic.set_direction(new_direction)
 
-    def __update_state(self):
-        self.snake_logic.move()
-        self.__handle_eating()
+    def _update_state(self):
+        """
+        Update the game-state:
+        - Make the move based on the direction saved in snake_logic
+        - Check if the move results in a collision
+        - Check if snake eats
+        """
+        new_head = self.snake_logic.move()
+        if self._is_collision(new_head):
+            self.running = False
+        self._handle_eating()
 
-    def __is_state_valid(self):
-        new_head = self.snake_logic.body[0]
+    def _is_collision(self, new_head):
+        """
+        Check if the new_head results in a collision.
+        The parameter is necessary to get the danger-moves in the training of the ai.
+        :param new_head: position of the new head
+        :return: bool: True if collision occurred, False if not
+        """
         if (
             new_head in self.snake_logic.body[1:]
             or new_head[0] < 0
@@ -76,15 +88,17 @@ class Game:
             or new_head[1] < 0
             or new_head[1] >= config.HEIGHT
         ):
-            self.running = False
+            return True
+        else:
+            return False
 
-    def __draw(self):
+    def _draw(self):
         self.snake_sprite.draw(self.screen)
         self.food_sprite.draw(self.screen)
 
     # Helper methods (not called from the run method directly)
 
-    def __handle_eating(self):
+    def _handle_eating(self):
         new_head = self.snake_logic.body[0]
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)

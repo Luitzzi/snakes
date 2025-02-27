@@ -28,6 +28,7 @@ class SnakeLogic:
     def move(self):
         new_head = self.__calc_new_head()
         self.body.insert(0, new_head)
+        return new_head
 
     def __calc_new_head(self):
         new_head = (
