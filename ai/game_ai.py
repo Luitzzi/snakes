@@ -53,7 +53,7 @@ class GameAI(Game):
         This is necessary for the __calc_reward method to determine the reward
         :return:
         """
-        new_head = self.snake_logic.body[0]
+        new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.snake_ate = True
             self.food_logic.respawn(self.snake_logic.body)
@@ -99,7 +99,7 @@ class GameAI(Game):
         :return: Snake died = -10; Snake ate = 10
         """
         self._update_state()
-        self._is_state_valid()
+        self._is_collision()
         self.__check_frame_iterations()
         if not self.running:
             return -10
@@ -113,5 +113,5 @@ class GameAI(Game):
         This prevents the agent from stalling the game with just turning in a cycle.
         The multiplication ensures that the snake eats, else wise the game ends earlier.
         """
-        if self.frame_iteration > 100 * len(self.snake_logic.body):
+        if self.frame_iteration > 50 * len(self.snake_logic.body):
             self.running = False
