@@ -99,7 +99,7 @@ class Game:
     # Helper methods (not called from the run method directly)
 
     def _handle_eating(self):
-        new_head = self.snake_logic.body[0]
+        new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)
         else:

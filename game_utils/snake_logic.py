@@ -25,6 +25,9 @@ class SnakeLogic:
                 if self.direction != Direction.up:
                     self.direction = Direction.down
 
+    def get_head(self):
+        return self.body[0]
+
     def move(self):
         new_head = self.__calc_new_head()
         self.body.insert(0, new_head)
