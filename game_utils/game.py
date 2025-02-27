@@ -28,7 +28,6 @@ class Game:
             pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
             self._handle_events()
             self._update_state()
-            self._is_state_valid()
             self._draw()
             pygame.display.flip()
             self.clock.tick(config.FPS)
@@ -60,11 +59,24 @@ class Game:
                     self.snake_logic.set_direction(Direction.down)
 
     def _update_state(self):
-        self.snake_logic.move()
+        """
+        Update the game-state:
+        - Make the move based on the direction saved in snake_logic
+        - Check if the move results in a collision
+        - Check if snake eats
+        """
+        new_head = self.snake_logic.move()
+        if self._is_collision(new_head):
+            self.running = False
         self._handle_eating()
 
-    def _is_state_valid(self):
-        new_head = self.snake_logic.body[0]
+    def _is_collision(self, new_head):
+        """
+        Check if the new_head results in a collision.
+        The parameter is necessary to get the danger-moves in the training of the ai.
+        :param new_head: position of the new head
+        :return: bool: True if collision occurred, False if not
+        """
         if (
             new_head in self.snake_logic.body[1:]
             or new_head[0] < 0
@@ -72,7 +84,9 @@ class Game:
             or new_head[1] < 0
             or new_head[1] >= config.HEIGHT
         ):
-            self.running = False
+            return True
+        else:
+            return False
 
     def _draw(self):
         self.snake_sprite.draw(self.screen)
