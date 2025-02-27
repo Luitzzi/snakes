@@ -30,7 +30,6 @@ class Game:
             self.__update_state()
             self.__is_state_valid()
             self.__draw()
-            print(self.get_time_since_start())
             pygame.display.flip()
             self.clock.tick(config.FPS)
         pygame.quit()
@@ -47,18 +46,22 @@ class Game:
             return running_time_milis // 1000
 
     def __handle_events(self):
+        new_direction = None
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.snake_logic.set_direction(Direction.left)
+                    new_direction = Direction.left
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.snake_logic.set_direction(Direction.right)
+                    new_direction = Direction.right
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.snake_logic.set_direction(Direction.up)
+                    new_direction = Direction.up
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.snake_logic.set_direction(Direction.down)
+                    new_direction = Direction.down
+        if new_direction:
+            self.snake_logic.set_direction(new_direction)
 
     def __update_state(self):
         self.snake_logic.move()
