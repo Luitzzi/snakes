@@ -25,6 +25,9 @@ class SnakeLogic:
                 if self.direction != Direction.up:
                     self.direction = Direction.down
 
+    def get_head(self):
+        return self.body[0]
+
     def move(self):
         """
         Moves the snake in the direction that is saved in self.direction.
