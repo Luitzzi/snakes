@@ -10,19 +10,24 @@ class SnakeLogic:
         self.body = self.starting_position
         self.direction = self.default_direction
         self.new_direction = self.default_direction
+        self.next_new_direction = self.default_direction
 
-    def set_direction(self, new_direction):
-        if not is_opposite_dir(self.direction, new_direction):
-            print(f"True {self.new_direction} - {new_direction}")
-            self.new_direction = new_direction
+    def set_direction(self, direction):
+        if self.direction == self.new_direction:
+            if not is_opposite_dir(self.direction, direction):
+                self.next_new_direction = self.new_direction = direction
         else:
-            print(f"False {self.direction} - {new_direction}")
+            print("a")
+            if not is_opposite_dir(self.new_direction, direction):
+                self.next_new_direction = direction
+                print("b")
 
     def get_head(self):
         return self.body[0]
 
     def move(self):
         self.direction = self.new_direction
+        self.new_direction = self.next_new_direction
         new_head = self.__calc_new_head()
         self.body.insert(0, new_head)
         return new_head
