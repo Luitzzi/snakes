@@ -34,57 +34,80 @@ class Game:
         self.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
         while self.game_running:
-            # Game loop
-            self._handle_events()
+            self._handle_events() # Always necessary for the QUIT event
 
+            # Process the logic for the current state
+            # TODO: Restrict the logic of the game_active state to 10 fps (more and the snake took speed)
             if self.game_state == GameStates.title_screen:
-                # Title screen
-                self.game_state = GameStates.game_active
-
+                self.__title_screen_logic()
             elif self.game_state == GameStates.game_active:
-                # Game active
-                pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
-                self._update_state()
-                self._draw()
-                pygame.display.flip()
-                self.clock.tick(config.FPS)
-
+                self.__game_active_logic()
             elif self.game_state == GameStates.game_over:
-                # Game over -> Snake died
-                pass
-
+                self.__game_over_logic()
         pygame.quit()
 
-    def get_time_since_start(self):
-        """
-        Returns the time until the game-loop, therefore the game started in milliseconds
-        :return: int representing milliseconds
-        """
-        if self.start_time == None:
-            return None
-        else:
-            running_time_milis = pygame.time.get_ticks() - self.start_time
-            return running_time_milis // 1000
+
+    #########
+    # Game states logic
+    ########
+
+    def __title_screen_logic(self):
+        self.game_state = GameStates.game_active
+        self.start_time = pygame.time.get_ticks() # Necessary to evaluate the score
+
+    def __game_active_logic(self):
+        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+        self._update_state()
+        self._draw()
+        pygame.display.flip()
+        self.clock.tick(config.FPS)
+
+    def __game_over_logic(self):
+        pass
+
+    #########
+    # Handle input events
+    ########
 
     def _handle_events(self):
-        new_direction = None
-
+        """
+        Handles all input events:
+        - Always checks for QUIT
+        - Afterward, it checks specifically the inputs from the different game states.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.game_running = False
             if self.game_state == GameStates.game_active:
-                if event.type == pygame.KEYDOWN:
-                    # Input for the movement
-                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                        new_direction = Direction.left
-                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                        new_direction = Direction.right
-                    elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                        new_direction = Direction.up
-                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                        new_direction = Direction.down
-                if new_direction:
-                    self.snake_logic.set_direction(new_direction)
+                self.__handle_game_active_input(event)
+            if self.game_state == GameStates.game_over:
+                self.__handle_game_over_input(event)
+
+    def __handle_game_active_input(self, event):
+        """
+        Handles the input that occurs during the time the player plays the game.
+        Input possibilities are w/UP , s/DOWN , a/LEFT , d/RIGHT
+        :param event: Input event from the player
+        """
+        new_direction = None
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                new_direction = Direction.left
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                new_direction = Direction.right
+            elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                new_direction = Direction.up
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                new_direction = Direction.down
+        if new_direction:
+            self.snake_logic.set_direction(new_direction)
+
+    def __handle_game_over_input(self, event):
+        pass
+
+    #########
+    # Other game-loop methods
+    ########
 
     def _update_state(self):
         """
@@ -120,7 +143,9 @@ class Game:
         self.snake_sprite.draw(self.screen)
         self.food_sprite.draw(self.screen)
 
-    # Helper methods (not called from the run method directly)
+    #########
+    # Helper methods
+    ########
 
     def _handle_eating(self):
         new_head = self.snake_logic.get_head()
@@ -129,3 +154,13 @@ class Game:
         else:
             self.snake_logic.body.pop()
 
+    def get_time_since_start(self):
+        """
+        Returns how long the player is playing in the game_active state
+        :return: int representing the time in seconds
+        """
+        if self.start_time == None:
+            return None
+        else:
+            running_time_millis = pygame.time.get_ticks() - self.start_time
+            return running_time_millis // 1000
