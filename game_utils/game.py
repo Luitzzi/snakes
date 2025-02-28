@@ -8,6 +8,7 @@ from game_utils.food_logic import FoodLogic
 from sprites.food_sprite import FoodSprite
 from sprites.snake_sprite import SnakeSprite
 
+
 class Game:
     """
     Class implementing the base logic of the game.
@@ -34,7 +35,7 @@ class Game:
         self.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
         while self.game_running:
-            self._handle_events() # Always necessary for the QUIT event
+            self._handle_events()  # Always necessary for the QUIT event
 
             # Process the logic for the current state
             # TODO: Restrict the logic of the game_active state to 10 fps (more and the snake took speed)
@@ -52,7 +53,7 @@ class Game:
 
     def __title_screen_logic(self):
         self.game_state = GameStates.game_active
-        self.start_time = pygame.time.get_ticks() # Necessary to evaluate the score
+        self.start_time = pygame.time.get_ticks()  # Necessary to evaluate the score
 
     def __game_active_logic(self):
         pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
@@ -91,11 +92,11 @@ class Game:
         new_direction = None
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                new_direction = Direction.NORTH
+                new_direction = Direction.WEST
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 new_direction = Direction.EAST
             elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                new_direction = Direction.WEST
+                new_direction = Direction.NORTH
             elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                 new_direction = Direction.SOUTH
         if new_direction:
