@@ -89,18 +89,15 @@ class Game:
         Input possibilities are w/UP , s/DOWN , a/LEFT , d/RIGHT
         :param event: Input event from the player
         """
-        new_direction = None
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                new_direction = Direction.WEST
+                self.snake_logic.set_direction(Direction.WEST)
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                new_direction = Direction.EAST
+                self.snake_logic.set_direction(Direction.EAST)
             elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                new_direction = Direction.NORTH
+                self.snake_logic.set_direction(Direction.NORTH)
             elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                new_direction = Direction.SOUTH
-        if new_direction:
-            self.snake_logic.set_direction(new_direction)
+                self.snake_logic.set_direction(Direction.SOUTH)
 
     def __handle_game_over_input(self, event):
         pass
@@ -135,6 +132,7 @@ class Game:
             or new_head[1] < 0
             or new_head[1] >= config.HEIGHT
         ):
+            print("collision")
             return True
         else:
             return False
