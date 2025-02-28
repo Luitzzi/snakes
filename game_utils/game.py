@@ -3,17 +3,26 @@ import pygame
 import config
 from game_utils.snake_logic import SnakeLogic
 from game_utils.direction import Direction
+from game_utils.game_states import GameStates
 from game_utils.food_logic import FoodLogic
 from sprites.food_sprite import FoodSprite
 from sprites.snake_sprite import SnakeSprite
 
 class Game:
+    """
+    Class implementing the base logic of the game.
+    - The run method implements the game loop calculating and drawing on frame per loop.
+    - Score of the game is determined by the time the snake is alive.
+    - Game states: game_active, game_over, TODO Landing Page
+    """
+
     def __init__(self):
         self.screen = pygame.display.set_mode(
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
         )
         self.clock = pygame.time.Clock()
-        self.running = True
+        self.game_running = True
+        self.game_state = GameStates.title_screen
         self.start_time = None
 
         self.snake_logic = SnakeLogic()
@@ -24,13 +33,22 @@ class Game:
     def run(self):
         self.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
-        while self.running:
-            pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
-            self._handle_events()
-            self._update_state()
-            self._draw()
-            pygame.display.flip()
-            self.clock.tick(config.FPS)
+        while self.game_running:
+            # Game loop
+            if self.game_state == GameStates.title_screen:
+                pass
+
+            elif self.game_state == GameStates.game_active:
+                pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+                self._handle_events()
+                self._update_state()
+                self._draw()
+                pygame.display.flip()
+                self.clock.tick(config.FPS)
+
+            elif self.game_state == GameStates.game_over:
+                pass
+
         pygame.quit()
 
     def get_time_since_start(self):
@@ -49,8 +67,9 @@ class Game:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.running = False
+                self.game_running = False
             if event.type == pygame.KEYDOWN:
+                # Input for the movement
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     new_direction = Direction.left
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
@@ -71,7 +90,7 @@ class Game:
         """
         new_head = self.snake_logic.move()
         if self._is_collision(new_head):
-            self.running = False
+            self.GameStates.game_over
         self._handle_eating()
 
     def _is_collision(self, new_head):
