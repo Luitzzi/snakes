@@ -159,7 +159,7 @@ class Game:
         Returns how long the player is playing in the game_active state
         :return: int representing the time in seconds
         """
-        if self.start_time == None:
+        if self.start_time is None:
             return None
         else:
             running_time_millis = pygame.time.get_ticks() - self.start_time
