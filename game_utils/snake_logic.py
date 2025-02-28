@@ -12,18 +12,18 @@ class SnakeLogic:
 
     def set_direction(self, new_direction):
         match new_direction:
-            case Direction.left:
-                if self.direction != Direction.right:
-                    self.direction = Direction.left
-            case Direction.right:
-                if self.direction != Direction.left:
-                    self.direction = Direction.right
-            case Direction.up:
-                if self.direction != Direction.down:
-                    self.direction = Direction.up
-            case Direction.down:
-                if self.direction != Direction.up:
-                    self.direction = Direction.down
+            case Direction.NORTH:
+                if self.direction != Direction.EAST:
+                    self.direction = Direction.NORTH
+            case Direction.EAST:
+                if self.direction != Direction.NORTH:
+                    self.direction = Direction.EAST
+            case Direction.WEST:
+                if self.direction != Direction.SOUTH:
+                    self.direction = Direction.WEST
+            case Direction.SOUTH:
+                if self.direction != Direction.WEST:
+                    self.direction = Direction.SOUTH
 
     def get_head(self):
         return self.body[0]

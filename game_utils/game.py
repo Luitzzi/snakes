@@ -46,7 +46,6 @@ class Game:
                 self.__game_over_logic()
         pygame.quit()
 
-
     #########
     # Game states logic
     ########
@@ -92,13 +91,13 @@ class Game:
         new_direction = None
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                new_direction = Direction.left
+                new_direction = Direction.NORTH
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                new_direction = Direction.right
+                new_direction = Direction.EAST
             elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                new_direction = Direction.up
+                new_direction = Direction.WEST
             elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                new_direction = Direction.down
+                new_direction = Direction.SOUTH
         if new_direction:
             self.snake_logic.set_direction(new_direction)
 
