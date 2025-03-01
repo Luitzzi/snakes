@@ -7,7 +7,8 @@ class SnakeLogic:
     starting_position = config.SNAKE_STARTING_POSITION
 
     def __init__(self):
-        self.body = self.starting_position
+        # copies the list, so the one from config is not modified when modifying body
+        self.body = list(self.starting_position)
         self.direction = self.default_direction
         self.new_direction = self.default_direction
         self.next_new_direction = self.default_direction

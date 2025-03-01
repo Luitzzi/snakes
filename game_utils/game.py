@@ -63,7 +63,10 @@ class Game:
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
-        pass
+        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+        self._draw()
+        pygame.display.flip()
+        self.clock.tick(config.FPS)
 
     #########
     # Handle input events
@@ -100,7 +103,13 @@ class Game:
                 self.snake_logic.set_direction(Direction.SOUTH)
 
     def __handle_game_over_input(self, event):
-        pass
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+                # Restart the game
+                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic()
+                self.game_state = GameStates.game_active
+            elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                self.game_running = False
 
     #########
     # Other game-loop methods
