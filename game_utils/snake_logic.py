@@ -1,5 +1,5 @@
 import config
-from game_utils.direction import Direction
+from game_utils.direction import is_opposite_dir
 
 
 class SnakeLogic:
@@ -7,27 +7,31 @@ class SnakeLogic:
     starting_position = config.SNAKE_STARTING_POSITION
 
     def __init__(self):
-        self.body = self.starting_position
+        # copies the list, so the one from config is not modified when modifying body
+        self.body = list(self.starting_position)
         self.direction = self.default_direction
+        self.new_direction = self.default_direction
+        self.next_new_direction = self.default_direction
 
-    def set_direction(self, new_direction):
-        match new_direction:
-            case Direction.left:
-                if self.direction != Direction.right:
-                    self.direction = Direction.left
-            case Direction.right:
-                if self.direction != Direction.left:
-                    self.direction = Direction.right
-            case Direction.up:
-                if self.direction != Direction.down:
-                    self.direction = Direction.up
-            case Direction.down:
-                if self.direction != Direction.up:
-                    self.direction = Direction.down
+    def set_direction(self, direction):
+        if self.direction == self.new_direction:
+            if not is_opposite_dir(self.direction, direction):
+                self.next_new_direction = self.new_direction = direction
+        else:
+            print("a")
+            if not is_opposite_dir(self.new_direction, direction):
+                self.next_new_direction = direction
+                print("b")
+
+    def get_head(self):
+        return self.body[0]
 
     def move(self):
+        self.direction = self.new_direction
+        self.new_direction = self.next_new_direction
         new_head = self.__calc_new_head()
         self.body.insert(0, new_head)
+        return new_head
 
     def __calc_new_head(self):
         new_head = (
