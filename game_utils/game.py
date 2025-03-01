@@ -120,7 +120,8 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
-                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic()
+                self.snake_logic = SnakeLogic()
+                self.snake_drawer.set_logic(self.snake_logic)
                 self.game_state = GameStates.game_active
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
                 self.game_running = False
@@ -139,7 +140,11 @@ class Game:
         new_head = self.snake_logic.move()
         if self._is_collision(new_head):
             self.game_state = GameStates.game_over
-        self._handle_eating()
+            self.snake_logic.set_hurt()
+            self.snake_logic.remove_head()
+            # this and also prevent removing last element, so snake does not move into collission
+        else:
+            self._handle_eating()
 
     def _is_collision(self, new_head):
         """

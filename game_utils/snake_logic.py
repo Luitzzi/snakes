@@ -25,6 +25,9 @@ class SnakeLogic:
     def get_head(self):
         return self.body[0]
 
+    def remove_head(self):
+        self.body.pop(0)
+
     def move(self):
         self.direction = self.new_direction
         self.new_direction = self.next_new_direction

@@ -88,8 +88,8 @@ class SnakeDrawer:
 
         return self.check_blink(DIZZY_RANGE)
 
-    def set_logic(self, snake_logic):
-        self.snake_logic = snake_logic
+    def set_logic(self, logic):
+        self.logic = logic
         self.dizzy_blink_start = None
 
 
