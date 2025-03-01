@@ -12,6 +12,7 @@ class SnakeLogic:
         self.new_direction = self.default_direction
         self.next_new_direction = self.default_direction
         self.wiggle_offset = 0  # set wiggle direction for head (left: 0, right: 1)
+        self.is_hurt = False
 
     def set_direction(self, direction):
         if self.direction == self.new_direction:
@@ -35,6 +36,9 @@ class SnakeLogic:
         self.wiggle_offset = 1 - self.wiggle_offset
         print(self.wiggle_offset)
         return new_head
+
+    def set_hurt(self):
+        self.is_hurt = True
 
     def __calc_new_head(self):
         new_head = (
