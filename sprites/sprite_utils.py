@@ -38,7 +38,6 @@ def load_spritesheet(name):
     spritesheet = load_sprite(name)  # dict with spritename -> sprite surface
     rows = int(spritesheet.get_height() / size)
     cols = int(spritesheet.get_width() / size)
-    print(f"{rows} {cols} {size}")
 
     sprites = []
     for i in range(rows):
