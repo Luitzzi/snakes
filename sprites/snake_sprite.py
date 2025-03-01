@@ -12,4 +12,4 @@ class SnakeSprite:
         self.tail = Sprite(sprites[1][2])
         self.eyelids = Sprite(sprites[2][0])
         self.eyelids_smushed = SpriteVariant(sprites[2][1])
-        self.head_smushed = SpriteVariant(sprites[2][1])
+        self.head_smushed = SpriteVariant(sprites[2][2])
