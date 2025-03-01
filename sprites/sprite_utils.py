@@ -22,6 +22,23 @@ class Sprite:
         self.right = SpriteVariant(sprite)
 
 
+class SpriteVariantList:
+    def __init__(self, input_sprite_list):
+        self.north = []
+        for sprite in input_sprite_list:
+            self.north.append(sprite.copy())
+        self.west = self.rotate_list(self.north)
+        self.south = self.rotate_list(self.west)
+        self.east = self.rotate_list(self.south)
+
+    def rotate_list(self, input_list):
+        out_list = []
+        for sprite in input_list:
+            rot_sprite = pygame.transform.rotate(sprite, 90)
+            out_list.append(rot_sprite)
+        return out_list
+
+
 #############
 # Functions #
 #############

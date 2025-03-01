@@ -48,23 +48,42 @@ class SnakeDrawer:
                         )
                         spr = self.gui.overlay_sprite(spr, eyelids)
 
+                spr = self.animate_head(wiggle)
+            elif i == last_index:
+                spr = self.animate_tail(i, segment, wiggle)
             else:
-                if i == last_index:
-                    direction = calc_direction(self.logic.body[i - 1], segment)
-                    spr = get_sprite_wiggle(wiggle, self.sprites.tail)
-                    spr = get_sprite_dir(direction, spr)
-                else:
-                    first_dir = calc_direction(self.logic.body[i - 1], segment)
-                    second_dir = calc_direction(segment, self.logic.body[i + 1])
-
-                    if first_dir == second_dir:
-                        spr = get_sprite_wiggle(wiggle, self.sprites.body)
-                        spr = get_sprite_dir(first_dir, spr)
-                    else:
-                        direction = calc_curve_dir(first_dir, second_dir)
-                        spr = get_sprite_dir(direction, self.sprites.curve)
+                spr = self.animate_body(i, segment, wiggle)
 
             self.gui.draw_sprite(screen, spr, segment[0], segment[1])
+
+    def animate_head(self, wiggle):
+        if not self.logic.is_hurt:
+            spr = get_sprite_wiggle(wiggle, self.sprites.head)
+            spr = get_sprite_dir(self.logic.direction, spr)
+            if self.check_normal_blink():
+                eyelids = get_sprite_wiggle(wiggle, self.sprites.eyelids)
+                eyelids = get_sprite_dir(self.logic.direction, eyelids)
+                spr = self.gui.overlay_sprite(spr, eyelids)
+        else:
+            spr = get_sprite_dir(self.logic.direction, self.sprites.dizzy)[0]
+        return spr
+
+    def animate_body(self, i, segment, wiggle):
+        first_dir = calc_direction(self.logic.body[i - 1], segment)
+        second_dir = calc_direction(segment, self.logic.body[i + 1])
+        if first_dir == second_dir:
+            spr = get_sprite_wiggle(wiggle, self.sprites.body)
+            spr = get_sprite_dir(first_dir, spr)
+        else:
+            direction = calc_curve_dir(first_dir, second_dir)
+            spr = get_sprite_dir(direction, self.sprites.curve)
+        return spr
+
+    def animate_tail(self, i, segment, wiggle):
+        direction = calc_direction(self.logic.body[i - 1], segment)
+        spr = get_sprite_wiggle(wiggle, self.sprites.tail)
+        spr = get_sprite_dir(direction, spr)
+        return spr
 
     def check_blink(self, range_):
         if get_time_ms() - self.last_blink >= self.blink_wait:
