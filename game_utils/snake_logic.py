@@ -19,10 +19,8 @@ class SnakeLogic:
             if not is_opposite_dir(self.direction, direction):
                 self.next_new_direction = self.new_direction = direction
         else:
-            print("a")
             if not is_opposite_dir(self.new_direction, direction):
                 self.next_new_direction = direction
-                print("b")
 
     def get_head(self):
         return self.body[0]
@@ -34,7 +32,6 @@ class SnakeLogic:
         self.body.insert(0, new_head)
         # change wiggle side
         self.wiggle_offset = 1 - self.wiggle_offset
-        print(self.wiggle_offset)
         return new_head
 
     def set_hurt(self):
