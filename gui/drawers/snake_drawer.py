@@ -96,45 +96,45 @@ class SnakeDrawer:
 def calc_direction(prev, curr):
     delta = curr[0] - prev[0]
     if delta > 0:
-        return Direction.left
+        return Direction.WEST
     elif delta < 0:
-        return Direction.right
+        return Direction.EAST
     else:
         delta = curr[1] - prev[1]
         if delta > 0:
-            return Direction.up
+            return Direction.NORTH
         elif delta < 0:
-            return Direction.down
+            return Direction.SOUTH
         else:
             print("Error, Snake positions overlap")
 
 
 def calc_curve_dir(first_dir, second_dir):
     if (
-        first_dir == Direction.up
-        and second_dir == Direction.right
-        or first_dir == Direction.left
-        and second_dir == Direction.down
+        first_dir == Direction.NORTH
+        and second_dir == Direction.EAST
+        or first_dir == Direction.WEST
+        and second_dir == Direction.SOUTH
     ):
-        return Direction.up
+        return Direction.NORTH
     elif (
-        first_dir == Direction.down
-        and second_dir == Direction.right
-        or first_dir == Direction.left
-        and second_dir == Direction.up
+        first_dir == Direction.SOUTH
+        and second_dir == Direction.EAST
+        or first_dir == Direction.WEST
+        and second_dir == Direction.NORTH
     ):
-        return Direction.left
+        return Direction.WEST
     elif (
-        first_dir == Direction.down
-        and second_dir == Direction.left
-        or first_dir == Direction.right
-        and second_dir == Direction.up
+        first_dir == Direction.SOUTH
+        and second_dir == Direction.WEST
+        or first_dir == Direction.EAST
+        and second_dir == Direction.NORTH
     ):
-        return Direction.down
+        return Direction.SOUTH
     elif (
-        first_dir == Direction.up
-        and second_dir == Direction.left
-        or first_dir == Direction.right
-        and second_dir == Direction.down
+        first_dir == Direction.NORTH
+        and second_dir == Direction.WEST
+        or first_dir == Direction.EAST
+        and second_dir == Direction.SOUTH
     ):
-        return Direction.right
+        return Direction.EAST

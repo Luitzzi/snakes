@@ -56,11 +56,11 @@ def create_sprite_path(name):
 
 
 def get_sprite_dir(direction, sprite_variant):
-    if direction == Direction.left:
+    if direction == Direction.WEST:
         return sprite_variant.west
-    elif direction == Direction.down:
+    elif direction == Direction.SOUTH:
         return sprite_variant.south
-    elif direction == Direction.right:
+    elif direction == Direction.EAST:
         return sprite_variant.east
     else:
         return sprite_variant.north

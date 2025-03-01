@@ -159,7 +159,7 @@ class Game:
         else:
             return False
 
-    def __draw(self):
+    def _draw(self):
         self.snake_drawer.draw(self.screen)
         self.food_sprite.draw(self.screen)
 
