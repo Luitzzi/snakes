@@ -1,6 +1,8 @@
+from config import SNAKE_BLINK_RANGE, SNAKE_BLINK_DURATION
 from game_utils.direction import Direction
 from sprites.snake_sprite import SnakeSprite
 from sprites.sprite_utils import get_sprite_dir, get_sprite_wiggle
+from utils import get_random_time, get_time_ms
 
 
 class SnakeDrawer:
@@ -8,6 +10,9 @@ class SnakeDrawer:
         self.gui = gui
         self.logic = snake_logic
         self.sprites = SnakeSprite()
+        self.last_blink = get_time_ms()
+        self.blink_wait = get_random_time(SNAKE_BLINK_RANGE)
+        self.is_blinking = True
 
     def draw(self, screen):
         last_index = len(self.logic.body) - 1
@@ -17,6 +22,10 @@ class SnakeDrawer:
             if i == 0:
                 spr = get_sprite_wiggle(wiggle, self.sprites.head)
                 spr = get_sprite_dir(self.logic.direction, spr)
+                if self.check_blink():
+                    eyelids = get_sprite_wiggle(wiggle, self.sprites.eyelids)
+                    eyelids = get_sprite_dir(self.logic.direction, eyelids)
+                    spr = self.gui.overlay_sprite(spr, eyelids)
             else:
                 if i == last_index:
                     direction = calc_direction(self.logic.body[i - 1], segment)
@@ -34,6 +43,14 @@ class SnakeDrawer:
                         spr = get_sprite_dir(direction, self.sprites.curve)
 
             self.gui.draw_sprite(screen, spr, segment[0], segment[1])
+
+    def check_blink(self):
+        if get_time_ms() - self.last_blink >= self.blink_wait:
+            self.blink_wait = get_random_time(SNAKE_BLINK_RANGE)
+            self.last_blink = get_time_ms()
+            return True
+
+        return get_time_ms() - self.last_blink <= SNAKE_BLINK_DURATION
 
 
 def calc_direction(prev, curr):

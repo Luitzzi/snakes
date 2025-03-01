@@ -30,3 +30,8 @@ def calc_starting_position(field_width, field_height):
         (field_width // 4, field_height // 2),
         (field_width // 4 - 1, field_height // 2),
     )
+
+
+# Snake Settings
+SNAKE_BLINK_RANGE = (2000, 3600)  # time in milliseconds where snake blinks
+SNAKE_BLINK_DURATION = 100  # duration of blink in milliseconds

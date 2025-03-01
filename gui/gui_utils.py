@@ -27,6 +27,12 @@ def draw_rect(screen, x, y, w, h, color):
     pygame.draw.rect(screen, color, rect)
 
 
+def overlay_sprite(base, top):
+    base = base.copy()
+    base.blit(top, (0, 0))
+    return base
+
+
 def draw_sprite(screen, sprite, x, y):
     sprite = pygame.transform.scale(sprite, (config.TILE_SIZE, config.TILE_SIZE))
     screen.blit(sprite, (calc_x(x), calc_y(y)))

@@ -28,15 +28,19 @@ class GUI:
         rect = pygame.Rect(x, y, w, h)
         pygame.draw.rect(screen, color, rect)
 
-    def transform_image(self, raw_image):
-        return pygame.transform.scale(raw_image, (self.tile_size, self.tile_size))
-
     def draw_image(self, screen, image, x, y):
         screen.blit(image, (self.calc_x(x), self.calc_y(y)))
 
+    def scale_sprite(self, raw_image):
+        return pygame.transform.scale(raw_image, (self.tile_size, self.tile_size))
+
     def draw_sprite(self, screen, sprite, x, y):
-        sprite = self.transform_image(sprite)
-        screen.blit(sprite, (self.calc_x(x), self.calc_y(y)))
+        screen.blit(self.scale_sprite(sprite), (self.calc_x(x), self.calc_y(y)))
+
+    def overlay_sprite(base, top):
+        base = base.copy()
+        base.blit(top, (0, 0))
+        return base
 
     def __calc_field_rect(self):
         return pygame.Rect(
