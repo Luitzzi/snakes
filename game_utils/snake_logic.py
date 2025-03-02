@@ -1,5 +1,6 @@
 import config
 from game_utils.direction import is_opposite_dir
+from sprites.sprite_utils import WIGGLE_L
 
 
 class SnakeLogic:
@@ -8,11 +9,12 @@ class SnakeLogic:
     def __init__(self, starting_position):
         # copies the list, so the one from config is not modified when modifying body
         self.body = list(starting_position)
+        self.prev_direction = self.default_direction
         self.direction = self.default_direction
         self.new_direction = self.default_direction
         self.next_new_direction = self.default_direction
-        self.wiggle_offset = 0  # set wiggle direction for head (left: 0, right: 1)
-        self.is_hurt = False
+        self.wiggle_offset = WIGGLE_L
+        self.collided_with = None
 
     def set_direction(self, direction):
         if self.direction == self.new_direction:
@@ -29,6 +31,7 @@ class SnakeLogic:
         self.body.pop(0)
 
     def move(self):
+        self.prev_direction = self.direction
         self.direction = self.new_direction
         self.new_direction = self.next_new_direction
         new_head = self.__calc_new_head()
@@ -37,8 +40,8 @@ class SnakeLogic:
         self.wiggle_offset = 1 - self.wiggle_offset
         return new_head
 
-    def set_hurt(self):
-        self.is_hurt = True
+    def collide(self, obstacle):
+        self.collided_with = obstacle
 
     def __calc_new_head(self):
         new_head = (

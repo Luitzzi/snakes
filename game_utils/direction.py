@@ -16,6 +16,9 @@ class Direction(Enum):
     def __getitem__(self, index):
         return self.value[index]
 
+    def val(self):
+        return self.value
+
 
 def is_opposite_dir(direction1, direction2):
     match direction1:
@@ -29,9 +32,13 @@ def is_opposite_dir(direction1, direction2):
             return direction2 == Direction.EAST
 
 
-class Wiggle(Enum):
-    left = 0
-    right = 1
+class Collision(Enum):
+    BODY = (0, 0)
+    TAIL = (1, 1)
+    LEFT = (-1, 0)
+    TOP = (0, -1)
+    RIGHT = (1, 0)
+    BOTTOM = (0, 1)
 
-    def __getitem__(self, index):
-        return self.value[index]
+    def val(self):
+        return self.value

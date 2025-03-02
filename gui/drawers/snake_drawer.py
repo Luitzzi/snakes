@@ -1,13 +1,13 @@
-from game_utils.direction import Direction
+from game_utils.direction import Direction, Collision
 from sprites.snake_sprite import SnakeSprite
-from sprites.sprite_utils import get_sprite_dir, get_sprite_wiggle
+from sprites.sprite_utils import get_sprite_dir, get_sprite_wiggle, WIGGLE_L, WIGGLE_R
 from utils import get_random_time, get_time_ms
 
 # time is in milliseconds
 BLINK_RANGE = (2000, 3600)  # start and end of time intervall where snake blinks once
 BLINK_DURATION = 100  # duration of blink in milliseconds
-DIZZY_RANGE = (200, 400)  # pause between individual blinks while disoriented
-DIZZY_DURATION = 2000  # duration where the snake blinks wildly before it's k.o.
+DIZZY_OFFSET = 250  # when the dizzy animation starts after colliding
+DIZZY_SPEED = 100  # time each frame of animation is shown
 
 
 class SnakeDrawer:
@@ -17,11 +17,14 @@ class SnakeDrawer:
         self.sprites = SnakeSprite()
         self.last_blink = get_time_ms()
         self.blink_wait = get_random_time(BLINK_RANGE)
-        self.dizzy_blink_start = None
+        self.collision_time = None
+        self.dizzy_index = 0
+        self.last_dizzy_change = None
 
     def draw(self, screen):
         last_index = len(self.logic.body) - 1
-        for i, segment in enumerate(self.logic.body):
+        for i in range(len(self.logic.body) - 1, -1, -1):
+            segment = self.logic.body[i]
             wiggle = (self.logic.wiggle_offset + i) % 2
 
             if i == 0:
@@ -57,7 +60,7 @@ class SnakeDrawer:
             self.gui.draw_sprite(screen, spr, segment[0], segment[1])
 
     def animate_head(self, wiggle):
-        if not self.logic.is_hurt:
+        if self.logic.collided_with is None:
             spr = get_sprite_wiggle(wiggle, self.sprites.head)
             spr = get_sprite_dir(self.logic.direction, spr)
             if self.check_normal_blink():
@@ -65,8 +68,59 @@ class SnakeDrawer:
                 eyelids = get_sprite_dir(self.logic.direction, eyelids)
                 spr = self.gui.overlay_sprite(spr, eyelids)
         else:
-            spr = get_sprite_dir(self.logic.direction, self.sprites.dizzy)[0]
+            if self.collision_time is None:
+                self.collision_time = get_time_ms()
+                self.last_dizzy_change = self.collision_time + DIZZY_OFFSET
+            spr = self.animate_collision()
+
         return spr
+
+    def animate_collision(self):
+        if get_time_ms() - self.collision_time <= DIZZY_OFFSET:
+            if self.logic.collided_with.val() == self.logic.prev_direction.val():
+                return get_sprite_dir(self.logic.direction, self.sprites.hit_wall)
+
+            match self.logic.collided_with:
+                case Collision.BODY:
+                    return get_sprite_dir(self.logic.direction, self.sprites.hit_body)
+                case Collision.TAIL:
+                    return get_sprite_dir(self.logic.direction, self.sprites.hit_body)
+                case Collision.LEFT:
+                    return self.animate_side_collision(Direction.NORTH, Direction.SOUTH)
+                case Collision.TOP:
+                    return self.animate_side_collision(Direction.EAST, Direction.WEST)
+                case Collision.RIGHT:
+                    return self.animate_side_collision(Direction.SOUTH, Direction.NORTH)
+                case Collision.TOP:
+                    return self.animate_side_collision(Direction.WEST, Direction.EAST)
+                case _:
+                    print("Collison collided_with has unexpected value")
+        else:
+            spr = get_sprite_dir(self.logic.prev_direction, self.sprites.dizzy)[0]
+            direction = self.logic.prev_direction
+            if self.logic.collided_with in (Collision.BODY, Collision.TAIL):
+                spr = get_sprite_dir(self.logic.direction, self.sprites.hit_body)
+                direction = self.logic.direction
+
+            dizzy_eyes = get_sprite_dir(direction, self.sprites.dizzy)
+            if get_time_ms() - self.last_dizzy_change >= DIZZY_SPEED:
+                self.dizzy_index += 1
+                if self.dizzy_index == len(dizzy_eyes):
+                    self.dizzy_index = 0
+
+            return self.gui.overlay_sprite(spr, dizzy_eyes[self.dizzy_index])
+
+    def animate_side_collision(self, dir_1, dir_2):
+        spr = self.sprites.hit_side
+        if self.logic.prev_direction == dir_1:
+            spr = get_sprite_wiggle(WIGGLE_L, spr)
+        elif self.logic.prev_direction == dir_2:
+            spr = get_sprite_wiggle(WIGGLE_R, spr)
+        else:
+            print(
+                f"Wrong Direction while hitting wall. dir: {self.logic.prev_direction.val()}, coll: {self.logic.collided_with.val()}"
+            )
+        return get_sprite_dir(self.logic.prev_direction, spr)
 
     def animate_body(self, i, segment, wiggle):
         first_dir = calc_direction(self.logic.body[i - 1], segment)
@@ -96,20 +150,12 @@ class SnakeDrawer:
     def check_normal_blink(self):
         return self.check_blink(BLINK_RANGE)
 
-    def check_dizzy_blink(self):
-        #  reset and setup for desoriented blinking
-        if self.dizzy_blink_start is None:
-            self.dizzy_blink_start = get_time_ms()
-            self.last_blink = get_time_ms()
-            self.blink_wait = get_random_time(DIZZY_RANGE)
-        elif get_time_ms() - self.dizzy_blink_start >= DIZZY_DURATION:
-            return True
-
-        return self.check_blink(DIZZY_RANGE)
-
     def set_logic(self, logic):
         self.logic = logic
-        self.dizzy_blink_start = None
+        self.collided_with = None
+        self.collision_time = None
+        self.dizzy_index = 0
+        self.last_dizzy_change = None
 
 
 def calc_direction(prev, curr):

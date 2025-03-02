@@ -3,7 +3,7 @@ import pygame
 import config
 from gui import GUI
 from game_utils.snake_logic import SnakeLogic
-from game_utils.direction import Direction
+from game_utils.direction import Direction, Collision
 from game_utils.game_states import GameStates
 from game_utils.food_logic import FoodLogic
 from gui.drawers.snake_drawer import SnakeDrawer
@@ -138,31 +138,38 @@ class Game:
         - Check if snake eats
         """
         new_head = self.snake_logic.move()
+        old_tail = self._handle_eating()
         if self._is_collision(new_head):
             self.game_state = GameStates.game_over
-            self.snake_logic.set_hurt()
-            self.snake_logic.remove_head()
-            # this and also prevent removing last element, so snake does not move into collission
-        else:
-            self._handle_eating()
+            # moving snake back when hitting wall, so it does not clip into wall
+            if self.snake_logic.collided_with not in (Collision.TAIL, Collision.BODY):
+                self.snake_logic.body.pop(0)
+                self.snake_logic.body.append(old_tail)
 
     def _is_collision(self, new_head):
         """
         Check if the new_head results in a collision.
+        Also passes collision information to SnakeLogic.
         The parameter is necessary to get the danger-moves in the training of the ai.
         :param new_head: position of the new head
         :return: bool: True if collision occurred, False if not
         """
-        if (
-            new_head in self.snake_logic.body[1:]
-            or new_head[0] < 0
-            or new_head[0] >= self.gui.field_width
-            or new_head[1] < 0
-            or new_head[1] >= self.gui.field_height
-        ):
-            return True
+        if new_head in self.snake_logic.body[1:]:
+            if new_head == self.snake_logic.body[-1]:
+                self.snake_logic.collide(Collision.TAIL)
+            else:
+                self.snake_logic.collide(Collision.BODY)
+        elif new_head[0] < 0:
+            self.snake_logic.collide(Collision.LEFT)
+        elif new_head[0] >= config.WIDTH:
+            self.snake_logic.collide(Collision.RIGHT)
+        elif new_head[1] < 0:
+            self.snake_logic.collide(Collision.TOP)
+        elif new_head[1] >= config.HEIGHT:
+            self.snake_logic.collide(Collision.BOTTOM)
         else:
             return False
+        return True
 
     def _draw(self):
         self.snake_drawer.draw(self.screen)
@@ -176,8 +183,9 @@ class Game:
         new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)
+            return None
         else:
-            self.snake_logic.body.pop()
+            return self.snake_logic.body.pop()
 
     def get_time_since_start(self):
         """

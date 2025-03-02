@@ -10,7 +10,7 @@ class SnakeSprite:
         self.mouth = SpriteVariant(sprites[0][2])
         self.hit_body = SpriteVariant(sprites[0][3])
         self.hit_wall = SpriteVariant(sprites[1][0])
-        self.hit_side = SpriteVariant(sprites[1][1])
+        self.hit_side = Sprite(sprites[1][1])
         self.body = Sprite(sprites[1][2])
         self.curve = SpriteVariant(sprites[1][3])
         self.tail = Sprite(sprites[2][0])

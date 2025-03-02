@@ -6,6 +6,10 @@ import config
 from game_utils.direction import Direction
 
 
+WIGGLE_L = 0
+WIGGLE_R = 1
+
+
 class SpriteVariant:
     def __init__(self, input_sprite):
         self.north = pygame.Surface.copy(input_sprite)
@@ -84,7 +88,7 @@ def get_sprite_dir(direction, sprite_variant):
 
 
 def get_sprite_wiggle(wiggle, sprite):
-    if wiggle == 1:
+    if wiggle == WIGGLE_R:
         return sprite.right
     else:
         return sprite.left
