@@ -34,7 +34,8 @@ def is_opposite_dir(direction1, direction2):
 
 class Collision(Enum):
     BODY = (0, 0)
-    TAIL = (1, 1)
+    CURVE = (1, 1)
+    TAIL = (-1, -1)
     LEFT = (-1, 0)
     TOP = (0, -1)
     RIGHT = (1, 0)

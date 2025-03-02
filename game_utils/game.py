@@ -2,11 +2,11 @@ import pygame
 
 import config
 from gui import GUI
-from game_utils.snake_logic import SnakeLogic
 from game_utils.direction import Direction, Collision
-from game_utils.game_states import GameStates
 from game_utils.food_logic import FoodLogic
-from gui.drawers.snake_drawer import SnakeDrawer
+from game_utils.game_states import GameStates
+from game_utils.snake_logic import SnakeLogic
+from gui.drawers.snake_drawer import SnakeDrawer, calc_direction
 from sprites.food_sprite import FoodSprite
 
 
@@ -142,7 +142,11 @@ class Game:
         if self._is_collision(new_head):
             self.game_state = GameStates.game_over
             # moving snake back when hitting wall, so it does not clip into wall
-            if self.snake_logic.collided_with not in (Collision.TAIL, Collision.BODY):
+            if self.snake_logic.collided_with not in (
+                Collision.TAIL,
+                Collision.BODY,
+                Collision.CURVE,
+            ):
                 self.snake_logic.body.pop(0)
                 self.snake_logic.body.append(old_tail)
 
@@ -158,7 +162,17 @@ class Game:
             if new_head == self.snake_logic.body[-1]:
                 self.snake_logic.collide(Collision.TAIL)
             else:
-                self.snake_logic.collide(Collision.BODY)
+                i = self.snake_logic.body[1:].index(new_head)
+                first_dir = calc_direction(
+                    self.snake_logic.body[i - 1], self.snake_logic.body[i]
+                )
+                second_dir = calc_direction(
+                    self.snake_logic.body[i], self.snake_logic.body[i + 1]
+                )
+                if first_dir == second_dir:
+                    self.snake_logic.collide(Collision.BODY)
+                else:
+                    self.snake_logic.collide(Collision.CURVE)
         elif new_head[0] < 0:
             self.snake_logic.collide(Collision.LEFT)
         elif new_head[0] >= config.WIDTH:

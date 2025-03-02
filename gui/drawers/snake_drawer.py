@@ -61,11 +61,9 @@ class SnakeDrawer:
 
     def animate_head(self, wiggle):
         if self.logic.collided_with is None:
-            spr = get_sprite_wiggle(wiggle, self.sprites.head)
-            spr = get_sprite_dir(self.logic.direction, spr)
+            spr = get_sprite_dir(self.logic.direction, self.sprites.head)
             if self.check_normal_blink():
-                eyelids = get_sprite_wiggle(wiggle, self.sprites.eyelids)
-                eyelids = get_sprite_dir(self.logic.direction, eyelids)
+                eyelids = get_sprite_dir(self.logic.direction, self.sprites.eyelids)
                 spr = self.gui.overlay_sprite(spr, eyelids)
         else:
             if self.collision_time is None:
@@ -83,8 +81,10 @@ class SnakeDrawer:
             match self.logic.collided_with:
                 case Collision.BODY:
                     return get_sprite_dir(self.logic.direction, self.sprites.hit_body)
+                case Collision.CURVE:
+                    return self.get_hit_curve_sprite()
                 case Collision.TAIL:
-                    return get_sprite_dir(self.logic.direction, self.sprites.hit_body)
+                    return self.get_hit_tail_spr()
                 case Collision.LEFT:
                     return self.animate_side_collision(Direction.NORTH, Direction.SOUTH)
                 case Collision.TOP:
@@ -96,13 +96,19 @@ class SnakeDrawer:
                 case _:
                     print("Collison collided_with has unexpected value")
         else:
-            spr = get_sprite_dir(self.logic.prev_direction, self.sprites.dizzy)[0]
+            spr = get_sprite_dir(self.logic.prev_direction, self.sprites.head)
             direction = self.logic.prev_direction
-            if self.logic.collided_with in (Collision.BODY, Collision.TAIL):
-                spr = get_sprite_dir(self.logic.direction, self.sprites.hit_body)
+            if self.logic.collided_with == Collision.BODY:
                 direction = self.logic.direction
+                spr = get_sprite_dir(direction, self.sprites.hit_body)
+            elif self.logic.collided_with == Collision.CURVE:
+                direction = self.logic.direction
+                spr = self.get_hit_curve_sprite()
+            elif self.logic.collided_with == Collision.TAIL:
+                direction = self.logic.direction
+                spr = self.get_hit_tail_spr()
 
-            dizzy_eyes = get_sprite_dir(direction, self.sprites.dizzy)
+            dizzy_eyes = get_sprite_dir(direction, self.sprites.dizzy_eyes)
             if get_time_ms() - self.last_dizzy_change >= DIZZY_SPEED:
                 self.dizzy_index += 1
                 if self.dizzy_index == len(dizzy_eyes):
@@ -137,6 +143,37 @@ class SnakeDrawer:
         direction = calc_direction(self.logic.body[i - 1], segment)
         spr = get_sprite_wiggle(wiggle, self.sprites.tail)
         spr = get_sprite_dir(direction, spr)
+        return spr
+
+    def get_hit_tail_spr(self):
+        wiggle = WIGGLE_L
+        tail_dir = calc_direction(self.logic.body[-2], self.logic.body[0])
+        if (
+            (self.logic.direction == Direction.WEST and tail_dir == Direction.NORTH)
+            or (self.logic.direction == Direction.NORTH and tail_dir == Direction.EAST)
+            or (self.logic.direction == Direction.EAST and tail_dir == Direction.SOUTH)
+            or (self.logic.direction == Direction.SOUTH and tail_dir == Direction.WEST)
+        ):
+            wiggle = WIGGLE_R
+        spr = get_sprite_wiggle(wiggle, self.sprites.hit_tail)
+        spr = get_sprite_dir(self.logic.direction, spr)
+        return spr
+
+    def get_hit_curve_sprite(self):
+        wiggle = WIGGLE_L
+        i = self.logic.body[1:].index(self.logic.body[0])
+        first_dir = calc_direction(self.logic.body[i - 1], self.logic.body[i])
+        second_dir = calc_direction(self.logic.body[i], self.logic.body[i + 1])
+        curve_dir = calc_curve_dir(first_dir, second_dir)
+        if (
+            (self.logic.direction == Direction.WEST and curve_dir == Direction.NORTH)
+            or (self.logic.direction == Direction.NORTH and curve_dir == Direction.EAST)
+            or (self.logic.direction == Direction.EAST and curve_dir == Direction.SOUTH)
+            or (self.logic.direction == Direction.SOUTH and curve_dir == Direction.WEST)
+        ):
+            wiggle = WIGGLE_R
+        spr = get_sprite_wiggle(wiggle, self.sprites.hit_curve)
+        spr = get_sprite_dir(self.logic.direction, spr)
         return spr
 
     def check_blink(self, range_):
