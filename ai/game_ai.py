@@ -5,6 +5,8 @@ import config
 from game_utils.game import Game
 from game_utils.direction import Direction
 from ai.agent_action import AgentAction
+from game_utils.game_states import GameStates
+
 
 class GameAI(Game):
     frame_iteration = 0
@@ -13,27 +15,28 @@ class GameAI(Game):
         super().__init__()
         """
         self.direction enables the snake agent to take an action from the perspective of the snake.
-        self.index_of_curr_direction (short idx) points to the element in the list in that the snake is currently moving.
+        self.index_of_curr_direction (short idx) points to the element in the direction list
+        in that the snake is currently moving.
         From the snake's perspective it can take a left (idx++) or right (idx--) turn.
         Afterwards the idx is taken % len(direction) to ensure that it is in the list's bounds.
         """
-        self.direction = [Direction.right, Direction.up, Direction.left, Direction.down]
+        self.direction = [Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH]
         self.index_of_curr_direction = 0
+
         self.snake_ate = False
 
     @override
     def run(self):
         self.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
-        while self.running:
-            pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+        while self.game_running:
             self._handle_events()
             # ai-agent interaction
-
-            self._draw()
-            pygame.display.flip()
-            self.clock.tick(config.FPS)
+            self.play_step(AgentAction.turn_left)
+            # draw the game
+            self.__game_active_logic()
         pygame.quit()
+
 
     @override
     def _handle_events(self):
@@ -43,7 +46,14 @@ class GameAI(Game):
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.running = False
+                self.game_running = False
+
+    @override
+    def __game_active_logic(self):
+        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+        self._draw()
+        pygame.display.flip()
+        self.clock.tick(config.FPS)
 
     @override
     def _handle_eating(self):
@@ -91,6 +101,7 @@ class GameAI(Game):
 
         # Update the direction in the snake instance
         new_direction = self.direction[self.index_of_curr_direction]
+        print(new_direction)
         self.snake_logic.set_direction(new_direction)
 
     def __calc_reward(self):
@@ -98,10 +109,14 @@ class GameAI(Game):
         Calculate the reward the ai-agent gets for its action
         :return: Snake died = -10; Snake ate = 10
         """
+        # Update the game
         self._update_state()
-        self._is_collision()
+        if self._is_collision(self.snake_logic.get_head()):
+            self.game_running = False
         self.__check_frame_iterations()
-        if not self.running:
+
+        # Calc reward
+        if not self.game_running:
             return -10
         if self.snake_ate:
             self.snake_ate = False
@@ -114,4 +129,4 @@ class GameAI(Game):
         The multiplication ensures that the snake eats, else wise the game ends earlier.
         """
         if self.frame_iteration > 50 * len(self.snake_logic.body):
-            self.running = False
+            self.game_running = False
