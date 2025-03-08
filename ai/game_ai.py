@@ -12,8 +12,8 @@ from game_utils.game_states import GameStates
 class GameAI(Game):
     frame_iteration = 0
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, width, height):
+        super().__init__(width, height)
         """
         self.direction enables the snake agent to take an action from the perspective of the snake.
         self.index_of_curr_direction (short idx) points to the element in the direction list
@@ -36,7 +36,7 @@ class GameAI(Game):
             # ai-agent interaction
             self.play_step(AgentAction.stay_straight)
             # draw the game
-            self.__game_active_logic()
+            self._game_active_logic()
         pygame.quit()
 
     @override
@@ -50,8 +50,8 @@ class GameAI(Game):
                 self.game_running = False
 
     @override
-    def __game_active_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+    def _game_active_logic(self):
+        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._draw()
         pygame.display.flip()
         self.clock.tick(config.FPS)
@@ -73,7 +73,7 @@ class GameAI(Game):
 
 
     def reset(self):
-        self.__init__()
+        self.__init__(self.gui.field_width, self.gui.field_height)
 
     def play_step(self, action):
         """
@@ -87,8 +87,8 @@ class GameAI(Game):
 
     def get_turn_directions(self):
         straight_direction = self.direction[self.index_of_curr_direction]
-        left_turn_direction = self.direction[self.index_of_curr_direction + 1]
-        right_turn_direction = self.direction[self.index_of_curr_direction - 1]
+        left_turn_direction = self.direction[(self.index_of_curr_direction + 1) % len(self.direction)]
+        right_turn_direction = self.direction[(self.index_of_curr_direction - 1) % len(self.direction)]
         return straight_direction, left_turn_direction, right_turn_direction
 
 

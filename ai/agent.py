@@ -101,7 +101,6 @@ class Agent:
         :return: List with bools in the form of: [is_danger_straight, is_danger_left, is_danger_right]
         """
         straight_direction, left_turn_direction, right_turn_direction = game.get_turn_directions()
-        print(straight_direction, left_turn_direction, right_turn_direction)
         snake_head = game.snake_logic.get_head()
         straight_position = add_position_tuples(snake_head, straight_direction)
         left_turn_position = add_position_tuples(snake_head, left_turn_direction)

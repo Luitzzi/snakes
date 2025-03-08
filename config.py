@@ -2,7 +2,7 @@ from pathlib import Path
 from game_utils.direction import Direction
 
 # General settings
-FPS = 5
+FPS = 1
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 

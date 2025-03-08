@@ -18,7 +18,8 @@ class Game:
     - Game states: game_active, game_over, TODO Landing Page
     """
 
-    def __init__(self, field_width, field_height):
+    def __init__(self, field_width, field_height, food_logic = None):
+        # food_logic used for dependency injection when testing
         self.screen = pygame.display.set_mode(
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
         )
@@ -33,10 +34,14 @@ class Game:
         self.test_mode = False
 
         # Setup game elements
-        snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
-        self.snake_logic = SnakeLogic(snake_starting_position)
+        self.snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
+        #self.snake_logic = SnakeLogic(self.snake_starting_position)
+        self.snake_logic = SnakeLogic([(1,2),(0,2)])
         self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
-        self.food_logic = FoodLogic(snake_starting_position, self.gui.field_width, self.gui.field_height)
+        self.food_logic = food_logic or FoodLogic(self.gui.field_width, self.gui.field_height)
+        #self.food_logic.respawn(self.snake_starting_position)
+        # Test
+        self.food_logic.set_food_position((2,2))
         self.food_sprite = FoodSprite(self.gui, self.food_logic)
 
     def run(self):
@@ -50,7 +55,7 @@ class Game:
             if self.game_state == GameStates.title_screen:
                 self.__title_screen_logic()
             elif self.game_state == GameStates.game_active:
-                self.__game_active_logic()
+                self._game_active_logic()
             elif self.game_state == GameStates.game_over:
                 self.__game_over_logic()
         pygame.quit()
@@ -63,7 +68,7 @@ class Game:
         self.game_state = GameStates.game_active
         self.start_time = pygame.time.get_ticks()  # Necessary to evaluate the score
 
-    def __game_active_logic(self):
+    def _game_active_logic(self):
         pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._update_state()
         self._draw()
@@ -114,7 +119,7 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
-                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic()
+                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic(self.snake_starting_position)
                 self.game_state = GameStates.game_active
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
                 self.game_running = False

@@ -8,16 +8,16 @@ class GUI:
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        self.tile_size = self.calc_tile_size()
-        self.offset_x = self.calc_offset_x()
-        self.offset_y = self.calc_offset_y()
-        self.field_rect = self.calc_field_rect()
+        self.tile_size = self.__calc_tile_size()
+        self.offset_x = self.__calc_offset_x()
+        self.offset_y = self.__calc_offset_y()
+        self.field_rect = self.__calc_field_rect()
 
     def draw_tile(self, screen, x, y, color):
         self.draw_rect(
             screen,
-            self.calc_x(x),
-            self.calc_y(y),
+            self.__calc_x(x),
+            self.__calc_y(y),
             self.tile_size,
             self.tile_size,
             color,
@@ -35,7 +35,7 @@ class GUI:
         )
 
     def draw_image(self, screen, image, x, y):
-        screen.blit(image, (self.calc_x(x), self.calc_y(y)))
+        screen.blit(image, (self.__calc_x(x), self.__calc_y(y)))
 
 
     def __calc_field_rect(self):
