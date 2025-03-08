@@ -1,16 +1,10 @@
-import pygame
+from pathlib import Path
 from game_utils.direction import Direction
 
 # General settings
 FPS = 5
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
-WIDTH = 12
-HEIGHT = 12
-TILE_SIZE = int(min(SCREEN_WIDTH / WIDTH, SCREEN_HEIGHT / HEIGHT))
-OFFSET_X = int((SCREEN_WIDTH - WIDTH * TILE_SIZE) / 2)
-OFFSET_Y = int((SCREEN_HEIGHT - HEIGHT * TILE_SIZE) / 2)
-FIELD_RECT = pygame.Rect(OFFSET_X, OFFSET_Y, WIDTH * TILE_SIZE, HEIGHT * TILE_SIZE)
 
 # Colors
 SNAKE_COLOR = (50, 100, 150)
@@ -18,6 +12,12 @@ FOOD_COLOR = (200, 60, 40)
 FIELD_COLOR = (200, 220, 150)
 BG_COLOR = (50, 50, 70)
 
+# Images
+ROOT_DIR = Path(__file__).resolve().parent # Gets the directory of the current script
+TOMATO_IMAGE_PATH = ROOT_DIR / "assets" / "apple.png"
+
 # Game starting position
-SNAKE_STARTING_POSITION = [(WIDTH // 4, HEIGHT // 2), (WIDTH // 4 - 1, HEIGHT // 2)]
 SNAKE_DEFAULT_DIRECTION = Direction.EAST
+def calc_starting_position(field_width, field_height):
+    return ((field_width // 4, field_height // 2),
+            (field_width // 4 - 1, field_height // 2))
