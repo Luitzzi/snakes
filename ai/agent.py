@@ -1,12 +1,11 @@
-from itertools import chain
 from collections import deque
 
 import torch
 import random
 import numpy as np
 
-from model import Linear_Qnet, QTrainer
-from game_utils.direction import Direction
+from ai.model import Linear_Qnet, QTrainer
+from game_utils.direction import Direction, add_position_tuples
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -24,19 +23,18 @@ class Agent:
         self.count_games = 0
         self.epsilon = 0 # Randomness
         self.gamma = 0.9 # Discount rate
-        self.memory = deque(maxlen = MAX_MEMORY) # Stores the state, action, reward, next_state and done as one tupel
+        self.memory = deque(maxlen = MAX_MEMORY) # Stores the state, action, reward, next_state and done as one tuple
         self.model = Linear_Qnet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)
         self.trainer = QTrainer(self.model, LEARNING_RATE, self.gamma)
 
     def get_state(self, game):
         """
-        Returns the current state of the environment
+        Returns the current state of the environment (11 values in a list)
         :param game:
         :return: Numpy array of bools (as int 0/1):
-            [danger_north, danger_east, danger_south, danger_west,  -danger_position
+            [is_danger_left, is_danger_straight, is_danger_right  -dangerous positions
              north, east, south, west,  -current_direction
-             north, east, south, west,  -food_direction
-             is_running]  -is game running
+             north, east, south, west]  -food_direction
         """
         danger_positions = self.__get_danger_positions(game)
         current_direction = self.__get_current_direction(game)
@@ -96,46 +94,27 @@ class Agent:
 
         return final_move
 
-
-    def __get_danger_positions(self, game):
+    @staticmethod
+    def __get_danger_positions(game):
         """
-        Check if there is a danger (collision) at any adjacent field of the snake's head.
-        :param game:
-        :return: List with bools in the form of: [danger_north, danger_east, danger_south, danger_west]
+        Check if there is a danger (collision for any possible action
+        :return: List with bools in the form of: [is_danger_straight, is_danger_left, is_danger_right]
         """
-        snake_head = game.snake_logic.body[0]
-        # Possible danger position
-        north_of_snake_head = snake_head + Direction.up
-        east_of_snake_head = snake_head + Direction.right
-        south_of_snake_head = snake_head + Direction.down
-        west_of_snake_head = snake_head + Direction.left
-        # Check danger positions
-        current_direction = game.snake_logic.direction
-        danger_north = False
-        danger_east = False
-        danger_south = False
-        danger_west = False
-        match current_direction:
-            case Direction.left:
-                danger_north = game._is_collision(north_of_snake_head)
-                danger_south = game._is_collision(south_of_snake_head)
-                danger_west = game._is_collision(west_of_snake_head)
-            case Direction.right:
-                danger_north = game._is_collision(north_of_snake_head)
-                danger_east = game._is_collision(east_of_snake_head)
-                danger_south = game._is_collision(south_of_snake_head)
-            case Direction.up:
-                danger_north = game._is_collision(north_of_snake_head)
-                danger_east = game._is_collision(east_of_snake_head)
-                danger_west = game._is_collision(west_of_snake_head)
-            case Direction.down:
-                danger_east = game._is_collision(east_of_snake_head)
-                danger_south = game._is_collision(south_of_snake_head)
-                danger_west = game._is_collision(west_of_snake_head)
+        straight_direction, left_turn_direction, right_turn_direction = game.get_turn_directions()
+        print(straight_direction, left_turn_direction, right_turn_direction)
+        snake_head = game.snake_logic.get_head()
+        straight_position = add_position_tuples(snake_head, straight_direction)
+        left_turn_position = add_position_tuples(snake_head, left_turn_direction)
+        right_turn_position = add_position_tuples(snake_head, right_turn_direction)
 
-        return [danger_north, danger_east, danger_south, danger_west]
+        is_danger_straight = game._is_collision(straight_position)
+        is_danger_left = game._is_collision(left_turn_position)
+        is_danger_right = game._is_collision(right_turn_position)
 
-    def __get_current_direction(self, game):
+        return [is_danger_left, is_danger_straight, is_danger_right]
+
+    @staticmethod
+    def __get_current_direction(game):
         """
         Returns the current direction in that the snake is moving
         :param game:
@@ -147,13 +126,13 @@ class Agent:
         south = False
         west = False
         match current_direction:
-            case Direction.up:
+            case Direction.NORTH:
                 north = True
-            case Direction.right:
+            case Direction.EAST:
                 east = True
-            case Direction.down:
+            case Direction.SOUTH:
                 south = True
-            case Direction.left:
+            case Direction.WEST:
                 west = True
 
         return [north, east, south, west]

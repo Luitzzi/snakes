@@ -27,3 +27,10 @@ def is_opposite_dir(direction1, direction2):
             return direction2 == Direction.NORTH
         case Direction.WEST:
             return direction2 == Direction.EAST
+
+def add_position_tuples(a, b):
+    """
+    Add two tuples with two values
+    :return: Resulting tuple from the addition
+    """
+    return (a[0] + b[0], a[1] + b[1])

@@ -2,6 +2,7 @@ import pygame
 from typing import override
 
 import config
+from ai.agent import Agent
 from game_utils.game import Game
 from game_utils.direction import Direction
 from ai.agent_action import AgentAction
@@ -24,6 +25,7 @@ class GameAI(Game):
         self.index_of_curr_direction = 0
 
         self.snake_ate = False
+        self.agent = Agent()
 
     @override
     def run(self):
@@ -32,11 +34,10 @@ class GameAI(Game):
         while self.game_running:
             self._handle_events()
             # ai-agent interaction
-            self.play_step(AgentAction.turn_left)
+            self.play_step(AgentAction.stay_straight)
             # draw the game
             self.__game_active_logic()
         pygame.quit()
-
 
     @override
     def _handle_events(self):
@@ -84,6 +85,13 @@ class GameAI(Game):
         self.__update_direction(action)
         return self.__calc_reward()
 
+    def get_turn_directions(self):
+        straight_direction = self.direction[self.index_of_curr_direction]
+        left_turn_direction = self.direction[self.index_of_curr_direction + 1]
+        right_turn_direction = self.direction[self.index_of_curr_direction - 1]
+        return straight_direction, left_turn_direction, right_turn_direction
+
+
     def __update_direction(self, action):
         """
         Update the direction the snake is moving.
@@ -101,7 +109,6 @@ class GameAI(Game):
 
         # Update the direction in the snake instance
         new_direction = self.direction[self.index_of_curr_direction]
-        print(new_direction)
         self.snake_logic.set_direction(new_direction)
 
     def __calc_reward(self):
