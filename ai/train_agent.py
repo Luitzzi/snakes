@@ -20,7 +20,7 @@ def train():
 
         agent.train_short_memory(state_old, action, reward, state_new)
         agent.remember(state_old, action, reward, state_new)
-        """
+        '''
         if done:
             # Train long memory and plot the results
             game.reset()
@@ -29,7 +29,7 @@ def train():
 
             if score > best_score
                 best_score = best_score
-                # agent.model.save()
+                agent.model.save()
 
             print(f"Game: {agent.count_games}, Score: {score}, Record: {best_score}")
 

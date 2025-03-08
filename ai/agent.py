@@ -5,6 +5,7 @@ import torch
 import random
 import numpy as np
 
+from model import Linear_Qnet, QTrainer
 from game_utils.direction import Direction
 
 MAX_MEMORY = 100_000
@@ -13,15 +14,19 @@ LEARNING_RATE = 0.01
 EPSILON_START = 80
 UPPER_BOUND_RANDOM_MOVE = 200
 
+INPUT_SIZE = 13 # 4 * danger, 4 * current_direction, 4 * food_direction, is_running
+HIDDEN_SIZE = 256
+OUTPUT_SIZE = 3
+
 class Agent:
 
     def __init__(self):
         self.count_games = 0
         self.epsilon = 0 # Randomness
-        self.gamma = 0 # Discount rate
+        self.gamma = 0.9 # Discount rate
         self.memory = deque(maxlen = MAX_MEMORY) # Stores the state, action, reward, next_state and done as one tupel
-        self.model = None # TODO
-        self.trainer = None # TODO
+        self.model = Linear_Qnet(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE)
+        self.trainer = QTrainer(self.model, LEARNING_RATE, self.gamma)
 
     def get_state(self, game):
         """
@@ -85,8 +90,8 @@ class Agent:
         else:
             # Move based on model
             state_torch = torch.tensor(state, dtype = torch.float32)
-            prediciton = self.model.predict(state_torch)
-            move = torch.argmax(prediciton).item()
+            prediction = self.model(state_torch)
+            move = torch.argmax(prediction).item()
             final_move[move] = 1
 
         return final_move
