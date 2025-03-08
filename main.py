@@ -4,7 +4,7 @@ from game_utils.game import Game
 
 def main():
     pygame.init()
-    game = Game()
+    game = Game(20,20)
     game.run()
 
 
