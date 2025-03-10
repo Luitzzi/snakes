@@ -1,6 +1,7 @@
 import pygame
 
 import config
+from gui import GUI
 from game_utils.snake_logic import SnakeLogic
 from game_utils.direction import Direction
 from game_utils.game_states import GameStates
@@ -17,19 +18,26 @@ class Game:
     - Game states: game_active, game_over, TODO Landing Page
     """
 
-    def __init__(self):
+    def __init__(self, field_width, field_height):
         self.screen = pygame.display.set_mode(
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
         )
+        # Setup field settings
+        self.gui = GUI(field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
+
+        # Setup game logic
         self.clock = pygame.time.Clock()
         self.game_running = True
         self.game_state = GameStates.title_screen
         self.start_time = None
+        self.test_mode = False
 
-        self.snake_logic = SnakeLogic()
-        self.snake_sprite = SnakeSprite(self.snake_logic)
-        self.food_logic = FoodLogic()
-        self.food_sprite = FoodSprite(self.food_logic)
+        # Setup game elements
+        snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
+        self.snake_logic = SnakeLogic(snake_starting_position)
+        self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
+        self.food_logic = FoodLogic(snake_starting_position, self.gui.field_width, self.gui.field_height)
+        self.food_sprite = FoodSprite(self.gui, self.food_logic)
 
     def run(self):
         self.screen.fill(config.BG_COLOR)
@@ -56,14 +64,14 @@ class Game:
         self.start_time = pygame.time.get_ticks()  # Necessary to evaluate the score
 
     def __game_active_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._update_state()
         self._draw()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
+        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._draw()
         pygame.display.flip()
         self.clock.tick(config.FPS)
@@ -137,11 +145,10 @@ class Game:
         if (
             new_head in self.snake_logic.body[1:]
             or new_head[0] < 0
-            or new_head[0] >= config.WIDTH
+            or new_head[0] >= self.gui.field_width
             or new_head[1] < 0
-            or new_head[1] >= config.HEIGHT
+            or new_head[1] >= self.gui.field_height
         ):
-            print("collision")
             return True
         else:
             return False
