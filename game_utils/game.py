@@ -1,7 +1,7 @@
 import pygame
 
 import config
-from gui import GUI
+from gui_utils import GuiUtils
 from game_utils.direction import Direction, Collision
 from game_utils.food_logic import FoodLogic
 from game_utils.game_states import GameStates
@@ -23,7 +23,7 @@ class Game:
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
         )
         # Setup field settings
-        self.gui = GUI(
+        self.gui = GuiUtils(
             field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT
         )
 
@@ -35,13 +35,13 @@ class Game:
         self.test_mode = False
 
         # Setup game elements
-        snake_starting_position = config.calc_starting_position(
+        self.snake_starting_position = config.calc_starting_position(
             self.gui.field_width, self.gui.field_height
         )
-        self.snake_logic = SnakeLogic(snake_starting_position)
+        self.snake_logic = SnakeLogic(self.snake_starting_position)
         self.snake_drawer = SnakeDrawer(self.gui, self.snake_logic)
         self.food_logic = FoodLogic(
-            snake_starting_position, self.gui.field_width, self.gui.field_height
+            self.snake_starting_position, self.gui.field_width, self.gui.field_height
         )
         self.food_sprite = FoodSprite(self.gui, self.food_logic)
 
@@ -120,7 +120,7 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
-                self.snake_logic = SnakeLogic()
+                self.snake_logic = SnakeLogic(self.snake_starting_position)
                 self.snake_drawer.set_logic(self.snake_logic)
                 self.game_state = GameStates.game_active
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
@@ -162,7 +162,7 @@ class Game:
             if new_head == self.snake_logic.body[-1]:
                 self.snake_logic.collide(Collision.TAIL)
             else:
-                i = self.snake_logic.body[1:].index(new_head)
+                i = self.snake_logic.body[1:].index(new_head) + 1
                 first_dir = calc_direction(
                     self.snake_logic.body[i - 1], self.snake_logic.body[i]
                 )
@@ -175,11 +175,11 @@ class Game:
                     self.snake_logic.collide(Collision.CURVE)
         elif new_head[0] < 0:
             self.snake_logic.collide(Collision.LEFT)
-        elif new_head[0] >= config.WIDTH:
+        elif new_head[0] >= self.gui.field_width:
             self.snake_logic.collide(Collision.RIGHT)
         elif new_head[1] < 0:
             self.snake_logic.collide(Collision.TOP)
-        elif new_head[1] >= config.HEIGHT:
+        elif new_head[1] >= self.gui.field_height:
             self.snake_logic.collide(Collision.BOTTOM)
         else:
             return False

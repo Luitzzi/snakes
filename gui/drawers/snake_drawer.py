@@ -28,29 +28,6 @@ class SnakeDrawer:
             wiggle = (self.logic.wiggle_offset + i) % 2
 
             if i == 0:
-                spr = get_sprite_wiggle(wiggle, self.sprites.head)
-                spr = get_sprite_dir(self.logic.direction, spr)
-                if self.check_blink():
-                    eyelids = get_sprite_wiggle(wiggle, self.sprites.eyelids)
-                    eyelids = get_sprite_dir(self.logic.direction, eyelids)
-                    spr = self.gui.overlay_sprite(spr, eyelids)
-                if not self.logic.is_hurt:
-                    spr = get_sprite_wiggle(wiggle, self.sprites.head)
-                    spr = get_sprite_dir(self.logic.direction, spr)
-                    if self.check_normal_blink():
-                        eyelids = get_sprite_wiggle(wiggle, self.sprites.eyelids)
-                        eyelids = get_sprite_dir(self.logic.direction, eyelids)
-                        spr = self.gui.overlay_sprite(spr, eyelids)
-                else:
-                    spr = get_sprite_dir(
-                        self.logic.direction, self.sprites.head_smushed
-                    )
-                    if self.check_dizzy_blink():
-                        eyelids = get_sprite_dir(
-                            self.logic.direction, self.sprites.eyelids_smushed
-                        )
-                        spr = self.gui.overlay_sprite(spr, eyelids)
-
                 spr = self.animate_head(wiggle)
             elif i == last_index:
                 spr = self.animate_tail(i, segment, wiggle)

@@ -1,17 +1,17 @@
 import pygame
 
 
-class GUI:
+class GuiUtils:
     def __init__(self, field_width, field_height, screen_width, screen_height):
         self.field_width = field_width
         self.field_height = field_height
         self.screen_width = screen_width
         self.screen_height = screen_height
 
-        self.tile_size = self.calc_tile_size()
-        self.offset_x = self.calc_offset_x()
-        self.offset_y = self.calc_offset_y()
-        self.field_rect = self.calc_field_rect()
+        self.tile_size = self.__calc_tile_size()
+        self.offset_x = self.__calc_offset_x()
+        self.offset_y = self.__calc_offset_y()
+        self.field_rect = self.__calc_field_rect()
 
     def draw_tile(self, screen, x, y, color):
         self.draw_rect(
@@ -29,15 +29,15 @@ class GUI:
         pygame.draw.rect(screen, color, rect)
 
     def draw_image(self, screen, image, x, y):
-        screen.blit(image, (self.calc_x(x), self.calc_y(y)))
+        screen.blit(image, (self.__calc_x(x), self.__calc_y(y)))
 
     def scale_sprite(self, raw_image):
         return pygame.transform.scale(raw_image, (self.tile_size, self.tile_size))
 
     def draw_sprite(self, screen, sprite, x, y):
-        screen.blit(self.scale_sprite(sprite), (self.calc_x(x), self.calc_y(y)))
+        screen.blit(self.scale_sprite(sprite), (self.__calc_x(x), self.__calc_y(y)))
 
-    def overlay_sprite(base, top):
+    def overlay_sprite(self, base, top):
         base = base.copy()
         base.blit(top, (0, 0))
         return base

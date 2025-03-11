@@ -8,7 +8,7 @@ class FoodSprite(pygame.sprite.Sprite):
         self.gui = gui
         self.food_logic = food_logic
         self.raw_image = pygame.image.load(config.TOMATO_IMAGE_PATH)
-        self.image = self.gui.transform_image(self.raw_image)
+        self.image = self.gui.scale_sprite(self.raw_image)
 
     def draw(self, screen):
         self.gui.draw_image(
