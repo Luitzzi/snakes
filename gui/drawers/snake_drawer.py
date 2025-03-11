@@ -161,7 +161,7 @@ class SnakeDrawer:
 
     def get_hit_curve_sprite(self):
         wiggle = WIGGLE_L
-        i = self.logic.body[1:].index(self.logic.body[0])
+        i = self.logic.body[1:].index(self.logic.body[0]) + 1
         first_dir = calc_direction(self.logic.body[i - 1], self.logic.body[i])
         second_dir = calc_direction(self.logic.body[i], self.logic.body[i + 1])
         curve_dir = calc_curve_dir(first_dir, second_dir)
