@@ -188,7 +188,7 @@ class Game:
         Draw all objects located on the field.
         Snake, food.
         """
-        self.snake_sprite.draw()
+        self.snake_drawer.draw()
         self.food_sprite.draw()
 
     #########

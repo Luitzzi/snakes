@@ -3,8 +3,6 @@ import pygame
 import config
 
 
-class GUI:
-
 class GuiUtils:
     def __init__(self, field_width, field_height, screen_width, screen_height):
         self.field_width = field_width
@@ -19,7 +17,6 @@ class GuiUtils:
         self.screen = self.__init_screen()
         self.__init_field()
         self.__init_fonts()
-
 
     def draw_tile(self, x, y, color):
         self.draw_rect(
@@ -56,7 +53,7 @@ class GuiUtils:
         :param x: X pos
         """
         if element.get_width() != element.get_height():
-            raise ValueError(f'Excepted element, needs to be a square')
+            raise ValueError("Excepted element, needs to be a square")
         self.screen.blit(element, (self.__calc_x(x), self.__calc_y(y)))
 
     def draw_element_screen(self, element, x, y):
@@ -70,11 +67,8 @@ class GuiUtils:
         rect.center = (x, y)
         self.screen.blit(element, rect)
 
-
     def __init_screen(self):
-        return pygame.display.set_mode(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
-        )
+        return pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
 
     def __init_field(self):
         self.tile_size = self.__calc_tile_size()

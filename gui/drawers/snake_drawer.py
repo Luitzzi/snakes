@@ -21,7 +21,7 @@ class SnakeDrawer:
         self.dizzy_index = 0
         self.last_dizzy_change = None
 
-    def draw(self, screen):
+    def draw(self):
         last_index = len(self.logic.body) - 1
         for i in range(len(self.logic.body) - 1, -1, -1):
             segment = self.logic.body[i]
@@ -34,7 +34,7 @@ class SnakeDrawer:
             else:
                 spr = self.animate_body(i, segment, wiggle)
 
-            self.gui.draw_sprite(screen, spr, segment[0], segment[1])
+            self.gui.draw_sprite(self.gui.screen, spr, segment[0], segment[1])
 
     def animate_head(self, wiggle):
         if self.logic.collided_with is None:
