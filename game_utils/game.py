@@ -26,7 +26,8 @@ class Game:
         self.clock = pygame.time.Clock()
         self.game_running = True
         self.game_state = GameStates.title_screen
-        self.start_time = None
+        self.time_alive = None
+        self.score = None
 
         # Setup game elements
         self.snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
@@ -37,7 +38,7 @@ class Game:
 
     def run(self):
         self.gui.screen.fill(config.BG_COLOR)
-        self.start_time = pygame.time.get_ticks()
+        self.time_alive = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()  # Always necessary for the QUIT event
 
@@ -57,7 +58,8 @@ class Game:
 
     def __title_screen_logic(self):
         self.game_state = GameStates.game_active
-        self.start_time = pygame.time.get_ticks()  # Necessary after the change to game_active to evaluate the score
+        self.time_alive = pygame.time.get_ticks()  # Necessary after the change to game_active to evaluate the score
+        self.score = 0
 
     def __game_active_logic(self):
         pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
@@ -69,13 +71,20 @@ class Game:
     def __game_over_logic(self):
         pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._draw_field_objects()
+        self.__render_game_over_text()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
     def __render_game_over_text(self):
+        time_alive_text = self.gui.text.render('Time alive:  ' + str(self.time_alive), True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(time_alive_text, self.gui.offset_x + time_alive_text.get_width() // 2 + 5,
+                                     time_alive_text.get_height() + 5)
+        score_text = self.gui.text.render('Score:  ' + str(self.score), True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(score_text, self.gui.offset_x + score_text.get_width() // 2 + 5,
+                                     time_alive_text.get_height() + score_text.get_height() + 10)
         game_over_text = self.gui.heading.render('Game Over', True, config.TEXT_COLOR, None)
-        restart_text = self.gui.subheading.render('press space', True, config.TEXT_COLOR, None)
         self.gui.draw_element_screen(game_over_text, self.gui.screen_width // 2, self.gui.screen_height // 4)
+        restart_text = self.gui.subheading.render('press space', True, config.TEXT_COLOR, None)
         self.gui.draw_element_screen(restart_text, self.gui.screen_width // 2, self.gui.screen_height // 2)
 
     #########
@@ -118,6 +127,8 @@ class Game:
                 # Restart the game
                 self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic(self.snake_starting_position)
                 self.game_state = GameStates.game_active
+                self.time_alive = pygame.time.get_ticks()
+                self.score = 0
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
                 self.game_running = False
 
@@ -135,6 +146,7 @@ class Game:
         new_head = self.snake_logic.move()
         if self._is_collision(new_head):
             self.game_state = GameStates.game_over
+            self.time_alive = self.get_time_alive()
         self._handle_eating()
 
     def _is_collision(self, new_head):
@@ -171,16 +183,17 @@ class Game:
         new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)
+            self.score += 1
         else:
             self.snake_logic.body.pop()
 
-    def get_time_since_start(self):
+    def get_time_alive(self):
         """
         Returns how long the player is playing in the game_active state
         :return: int representing the time in seconds
         """
-        if self.start_time is None:
+        if self.time_alive is None:
             return None
         else:
-            running_time_millis = pygame.time.get_ticks() - self.start_time
+            running_time_millis = pygame.time.get_ticks() - self.time_alive
             return running_time_millis // 1000
