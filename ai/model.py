@@ -3,7 +3,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.funcional as F
+import torch.nn.functional as F
 
 class Linear_Qnet(nn.Module):
 
@@ -46,4 +46,18 @@ class QTrainer:
             action = torch.unsqueeze(state, 0)
             reward = torch.unsqueeze(state, 0)
             is_running = (is_running, )
+
+        predicted_Q = self.model(state)
+        target = predicted_Q.clone()
+        for idx in range(len(is_running)):
+            Q_new = reward[idx]
+            if is_running[idx]:
+                Q_new = reward + self.gamma * torch.max(self.model(next_state[idx]))
+
+            target[idx] [torch.argmax(action).item] = Q_new
+
+        self.optimizer.zero_grad()
+        loss = self.criterion(target, predicted_Q)
+        loss.backward()
+        self.optimizer.step()
 

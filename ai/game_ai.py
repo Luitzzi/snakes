@@ -77,13 +77,14 @@ class GameAI(Game):
 
     def play_step(self, action):
         """
-        Execute the action the ai-agent chose and return the corresponding reward.
+        Execute the action the ai-agent chose.
         :param action (AgentAction): turn_left, turn_right or stay_straight
         :return: Reward for the chosen action: Snake died = -10; Snake ate = 10
+                 is_running bool
         """
         self.frame_iteration += 1
         self.__update_direction(action)
-        return self.__calc_reward()
+        return self.__calc_reward(), self.game_running
 
     def get_turn_directions(self):
         straight_direction = self.direction[self.index_of_curr_direction]

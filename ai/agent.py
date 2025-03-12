@@ -8,7 +8,7 @@ from ai.model import Linear_Qnet, QTrainer
 from game_utils.direction import Direction, add_position_tuples
 
 MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
+BATCH_SIZE = 1_000
 LEARNING_RATE = 0.01
 EPSILON_START = 80
 UPPER_BOUND_RANDOM_MOVE = 200
