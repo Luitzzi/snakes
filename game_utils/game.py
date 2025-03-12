@@ -72,6 +72,12 @@ class Game:
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
+    def __render_game_over_text(self):
+        game_over_text = self.gui.heading.render('Game Over', True, config.TEXT_COLOR, None)
+        restart_text = self.gui.subheading.render('press space', True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(game_over_text, self.gui.screen_width // 2, self.gui.screen_height // 4)
+        self.gui.draw_element_screen(restart_text, self.gui.screen_width // 2, self.gui.screen_height // 2)
+
     #########
     # Handle input events
     ########
