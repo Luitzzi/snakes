@@ -17,10 +17,8 @@ class SnakeLogic:
             if not is_opposite_dir(self.direction, direction):
                 self.next_new_direction = self.new_direction = direction
         else:
-            print("a")
             if not is_opposite_dir(self.new_direction, direction):
                 self.next_new_direction = direction
-                print("b")
 
     def get_head(self):
         return self.body[0]

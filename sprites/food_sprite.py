@@ -11,8 +11,8 @@ class FoodSprite(pygame.sprite.Sprite):
         self.raw_image = pygame.image.load(config.TOMATO_IMAGE_PATH)
         self.image = self.gui.transform_image(self.raw_image)
 
-    def draw(self, screen):
-        self.gui.draw_image(
-            screen, self.image, self.food_logic.location[0], self.food_logic.location[1]
+    def draw(self):
+        self.gui.draw_element_field(
+            self.image, self.food_logic.location[0], self.food_logic.location[1]
         )
 
