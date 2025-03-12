@@ -19,9 +19,6 @@ class Game:
     """
 
     def __init__(self, field_width, field_height):
-        self.screen = pygame.display.set_mode(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
-        )
         # Setup field settings
         self.gui = GuiUtils(
             field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT
@@ -32,7 +29,6 @@ class Game:
         self.game_running = True
         self.game_state = GameStates.title_screen
         self.start_time = None
-        self.test_mode = False
 
         # Setup game elements
         self.snake_starting_position = config.calc_starting_position(
@@ -46,7 +42,7 @@ class Game:
         self.food_sprite = FoodSprite(self.gui, self.food_logic)
 
     def run(self):
-        self.screen.fill(config.BG_COLOR)
+        self.gui.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()  # Always necessary for the QUIT event
@@ -67,18 +63,20 @@ class Game:
 
     def __title_screen_logic(self):
         self.game_state = GameStates.game_active
-        self.start_time = pygame.time.get_ticks()  # Necessary to evaluate the score
+        self.start_time = (
+            pygame.time.get_ticks()
+        )  # Necessary after the change to game_active to evaluate the score
 
     def __game_active_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
+        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._update_state()
-        self._draw()
+        self._draw_field_objects()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
-        self._draw()
+        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
+        self._draw_field_objects()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
@@ -185,9 +183,13 @@ class Game:
             return False
         return True
 
-    def _draw(self):
-        self.snake_drawer.draw(self.screen)
-        self.food_sprite.draw(self.screen)
+    def _draw_field_objects(self):
+        """
+        Draw all objects located on the field.
+        Snake, food.
+        """
+        self.snake_sprite.draw()
+        self.food_sprite.draw()
 
     #########
     # Helper methods
