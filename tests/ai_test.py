@@ -18,7 +18,7 @@ class GameAI_Test(GameAI):
         self.gui.screen.fill(config.BG_COLOR)
         self.time_alive = pygame.time.get_ticks()
         while self.game_running:
-            self._handle_events()
+            self.__handle_events()
             # ai-agent interaction
             self.play_step(AgentAction.stay_straight)
             # draw the game

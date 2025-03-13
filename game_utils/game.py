@@ -143,19 +143,21 @@ class Game:
         - Check if the move results in a collision
         - Check if snake eats
         """
-        new_head = self.snake_logic.move()
-        if self._is_collision(new_head):
+        self.snake_logic.move()
+
+        if self._is_collision():
             self.game_state = GameStates.game_over
             self.time_alive = self.get_time_alive()
+
         self._handle_eating()
 
-    def _is_collision(self, new_head):
+    def _is_collision(self):
         """
         Check if the new_head results in a collision.
         The parameter is necessary to get the danger-moves in the training of the AI.
-        :param new_head: position of the new head
         :return: bool: True if collision occurred, False if not
         """
+        new_head = self.snake_logic.get_head()
         if (
             new_head in self.snake_logic.body[1:]
             or new_head[0] < 0
