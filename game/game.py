@@ -196,6 +196,7 @@ class Game:
     ########
 
     def _handle_eating(self):
+        self.snake_logic.set_food_pos(self.food_logic.location)
         new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)

@@ -25,6 +25,7 @@ class SnakeDrawer:
         self.collision_time = None
         self.dizzy_index = 0
         self.last_dizzy_change = None
+        self.has_eaten: int = 0
 
     def draw(self):
         last_index = len(self.logic.body) - 1
@@ -33,7 +34,7 @@ class SnakeDrawer:
             wiggle = (self.logic.wiggle_offset + i) % 2
 
             if i == 0:
-                spr = self.animate_head(wiggle)
+                spr = self.animate_head()
             elif i == last_index:
                 spr = self.animate_tail(i, segment, wiggle)
             else:
@@ -41,9 +42,9 @@ class SnakeDrawer:
 
             self.gui.draw_sprite(self.gui.screen, spr, segment[0], segment[1])
 
-    def animate_head(self, wiggle):
+    def animate_head(self):
         if self.logic.collided_with is None:
-            spr = get_sprite_dir(self.logic.direction, self.sprites.head)
+            spr = get_sprite_dir(self.logic.direction, self.get_head_sprite())
             if self.check_normal_blink():
                 eyelids = get_sprite_dir(self.logic.direction, self.sprites.eyelids)
                 spr = self.gui.overlay_sprite(spr, eyelids)
@@ -54,6 +55,19 @@ class SnakeDrawer:
             spr = self.animate_collision()
 
         return spr
+
+    def get_head_sprite(self):
+        if self.logic.is_food_ahead():
+            self.has_eaten = 3
+            return self.sprites.mouth
+        elif self.has_eaten > 0:
+            self.has_eaten -= 1
+            if self.has_eaten == 2:
+                return self.sprites.head
+            else:
+                return self.sprites.tongue
+        else:
+            return self.sprites.head
 
     def animate_collision(self):
         if get_time_ms() - self.collision_time <= DIZZY_OFFSET:
