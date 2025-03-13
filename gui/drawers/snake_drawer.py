@@ -1,4 +1,4 @@
-from game.direction import Direction, Collision
+from defs import Collision, Direction
 from gui.sprites.snake_sprite import SnakeSprite
 from gui.sprites.sprite_utils import (
     get_sprite_dir,

@@ -1,6 +1,11 @@
 from enum import Enum
 
 
+# Types
+type TPos = tuple[int, int]
+
+
+# Enums
 class Direction(Enum):
     """
     The direction in that the snake can move.
@@ -18,18 +23,6 @@ class Direction(Enum):
 
     def val(self):
         return self.value
-
-
-def is_opposite_dir(direction1, direction2):
-    match direction1:
-        case Direction.NORTH:
-            return direction2 == Direction.SOUTH
-        case Direction.EAST:
-            return direction2 == Direction.WEST
-        case Direction.SOUTH:
-            return direction2 == Direction.NORTH
-        case Direction.WEST:
-            return direction2 == Direction.EAST
 
 
 class Collision(Enum):

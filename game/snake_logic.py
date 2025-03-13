@@ -1,6 +1,6 @@
 import config
-from game.direction import is_opposite_dir
 from gui.sprites.sprite_utils import WIGGLE_L
+from defs import Direction, TPos
 
 
 class SnakeLogic:

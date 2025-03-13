@@ -1,5 +1,5 @@
 from pathlib import Path
-from game.direction import Direction
+from defs import Direction
 
 # General settings
 FPS = 5

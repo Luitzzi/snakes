@@ -2,7 +2,7 @@ import pygame
 
 import config
 from gui.gui_utils import GuiUtils
-from game.direction import Direction, Collision
+from defs import Direction, Collision
 from game.food_logic import FoodLogic
 from game.game_states import GameStates
 from game.snake_logic import SnakeLogic
