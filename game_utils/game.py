@@ -125,7 +125,7 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
-                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic()
+                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic(self.snake_starting_position)
                 self.game_state = GameStates.game_active
                 self.time_alive = pygame.time.get_ticks()
                 self.score = 0
@@ -152,7 +152,7 @@ class Game:
     def _is_collision(self, new_head):
         """
         Check if the new_head results in a collision.
-        The parameter is necessary to get the danger-moves in the training of the ai.
+        The parameter is necessary to get the danger-moves in the training of the AI.
         :param new_head: position of the new head
         :return: bool: True if collision occurred, False if not
         """
@@ -163,7 +163,6 @@ class Game:
             or new_head[1] < 0
             or new_head[1] >= self.gui.field_height
         ):
-            print("collision")
             return True
         else:
             return False

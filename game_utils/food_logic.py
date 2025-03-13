@@ -1,7 +1,4 @@
 import random
-import config
-import gui_utils
-
 
 class FoodLogic:
     def __init__(self, snake_starting_position, field_width, field_height):
@@ -14,8 +11,8 @@ class FoodLogic:
         valid_location = False
         while not valid_location:
             new_location = (
-                random.randrange(0, config.WIDTH),
-                random.randrange(0, config.HEIGHT),
+                random.randrange(0, self.field_width),
+                random.randrange(0, self.field_height),
             )
             valid_location = self.__is_location_valid(new_location, snake_body)
         self.location = new_location
@@ -23,7 +20,8 @@ class FoodLogic:
     def set_food_position(self, position):
         self.location = position
 
-    def __is_location_valid(self, new_location, snake_body):
+    @staticmethod
+    def __is_location_valid(new_location, snake_body):
         if new_location in snake_body:
             return False
         else:

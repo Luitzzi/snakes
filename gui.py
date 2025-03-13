@@ -41,6 +41,7 @@ class GUI:
         The element has to be a square
         :param element: Element that should be drawn
         :param x: X pos
+        :param y: Y pos
         """
         if element.get_width() != element.get_height():
             raise ValueError(f'Excepted element, needs to be a square')
@@ -57,8 +58,8 @@ class GUI:
         rect.center = (x, y)
         self.screen.blit(element, rect)
 
-
-    def __init_screen(self):
+    @staticmethod
+    def __init_screen():
         return pygame.display.set_mode(
             (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
         )

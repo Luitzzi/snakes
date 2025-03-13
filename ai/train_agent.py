@@ -1,7 +1,8 @@
-from networkx.algorithms.tournament import score_sequence
+import pygame
 
-from agent import Agent
-from game_ai import GameAI
+import config
+from ai.agent import Agent
+from ai.game_ai import GameAI
 from ai.plotter import plot
 
 def train():
@@ -11,11 +12,15 @@ def train():
     total_score = 0
     best_score = 0
 
+    pygame.init()
     agent = Agent()
-    game = GameAI
+    game = GameAI(20,20)
 
     # Training loop
     while True:
+        print(agent.epsilon)
+        game.time_alive = pygame.time.get_ticks()
+        game.gui.screen.fill(config.BG_COLOR)
         state_old = agent.get_state(game)
         action = agent.get_action(state_old)
         reward, is_running = game.play_step(action)
@@ -26,12 +31,13 @@ def train():
 
         if not is_running:
             # Train long memory and plot the results
-            game.reset(game)
+            score = game.score
+            game.reset()
             agent.count_games += 1
             agent.train_long_memory()
 
             if score > best_score:
-                best_score = best_score
+                best_score = score
                 agent.model.save()
 
             print(f"Game: {agent.count_games}, Score: {score}, Record: {best_score}")

@@ -42,9 +42,9 @@ class QTrainer:
 
         if len(state.shape) == 1:
             state = torch.unsqueeze(state, 0)
-            next_state = torch.unsqueeze(state, 0)
-            action = torch.unsqueeze(state, 0)
-            reward = torch.unsqueeze(state, 0)
+            next_state = torch.unsqueeze(next_state, 0)
+            action = torch.unsqueeze(action, 0)
+            reward = torch.unsqueeze(reward, 0)
             is_running = (is_running, )
 
         predicted_Q = self.model(state)
@@ -52,12 +52,13 @@ class QTrainer:
         for idx in range(len(is_running)):
             Q_new = reward[idx]
             if is_running[idx]:
-                Q_new = reward + self.gamma * torch.max(self.model(next_state[idx]))
+                Q_new = reward[idx] + self.gamma * torch.max(self.model(next_state[idx]))
 
-            target[idx] [torch.argmax(action).item] = Q_new
+            target[idx][torch.argmax(action).item()] = Q_new
 
         self.optimizer.zero_grad()
         loss = self.criterion(target, predicted_Q)
         loss.backward()
+
         self.optimizer.step()
 

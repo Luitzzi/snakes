@@ -13,7 +13,7 @@ LEARNING_RATE = 0.01
 EPSILON_START = 80
 UPPER_BOUND_RANDOM_MOVE = 200
 
-INPUT_SIZE = 13 # 4 * danger, 4 * current_direction, 4 * food_direction, is_running
+INPUT_SIZE = 11 # 3 * danger, 4 * current_direction, 4 * food_direction
 HIDDEN_SIZE = 256
 OUTPUT_SIZE = 3
 
@@ -83,7 +83,7 @@ class Agent:
         final_move = [0, 0, 0]
         if random.randint(0, UPPER_BOUND_RANDOM_MOVE) < self.epsilon:
             # Random move
-            move = random.randint(0, len(final_move))
+            move = random.randint(0, len(final_move) - 1)
             final_move[move] = 1
         else:
             # Move based on model

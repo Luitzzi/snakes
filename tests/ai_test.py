@@ -15,8 +15,8 @@ class GameAI_Test(GameAI):
 
     @override
     def run(self):
-        self.screen.fill(config.BG_COLOR)
-        self.start_time = pygame.time.get_ticks()
+        self.gui.screen.fill(config.BG_COLOR)
+        self.time_alive = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()
             # ai-agent interaction

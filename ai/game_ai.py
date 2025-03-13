@@ -3,10 +3,14 @@ from typing import override
 
 import config
 from ai.agent import Agent
+from game_utils.food_logic import FoodLogic
 from game_utils.game import Game
 from game_utils.direction import Direction
 from ai.agent_action import AgentAction
 from game_utils.game_states import GameStates
+from game_utils.snake_logic import SnakeLogic
+from sprites.food_sprite import FoodSprite
+from sprites.snake_sprite import SnakeSprite
 
 
 class GameAI(Game):
@@ -24,17 +28,30 @@ class GameAI(Game):
         self.direction = [Direction.EAST, Direction.NORTH, Direction.WEST, Direction.SOUTH]
         self.index_of_curr_direction = 0
 
+        self.game_state = GameStates.game_active
         self.snake_ate = False
-        self.agent = Agent()
+        self.score = 0
+
+    def reset(self):
+        self.game_running = True
+        self.game_state = GameStates.game_active
+        self.snake_logic = SnakeLogic(self.snake_starting_position)
+        self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
+        self.food_logic = FoodLogic(self.snake_starting_position, self.gui.field_width, self.gui.field_height)
+        self.food_sprite = FoodSprite(self.gui, self.food_logic)
+
+        self.snake_ate = False
+        self.score = 0
+        self.frame_iteration = 0
 
     @override
     def run(self):
-        self.screen.fill(config.BG_COLOR)
-        self.start_time = pygame.time.get_ticks()
+        self.gui.screen.fill(config.BG_COLOR)
+        self.time_alive = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()
             # ai-agent interaction
-            self.play_step(AgentAction.stay_straight)
+
             # draw the game
             self._game_active_logic()
         pygame.quit()
@@ -51,8 +68,12 @@ class GameAI(Game):
 
     @override
     def _game_active_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
-        self._draw()
+        """
+        Only draws the field and the game-objects.
+        The movement was handled inside the play_step in the run method.
+        """
+        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
+        self._draw_field_objects()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
@@ -71,19 +92,17 @@ class GameAI(Game):
         else:
             self.snake_logic.body.pop()
 
-
-    def reset(self):
-        self.__init__(self.gui.field_width, self.gui.field_height)
-
     def play_step(self, action):
         """
         Execute the action the ai-agent chose.
-        :param action (AgentAction): turn_left, turn_right or stay_straight
+        :param action: turn_left, turn_right or stay_straight
         :return: Reward for the chosen action: Snake died = -10; Snake ate = 10
                  is_running bool
         """
         self.frame_iteration += 1
         self.__update_direction(action)
+
+        self._game_active_logic()
         return self.__calc_reward(), self.game_running
 
     def get_turn_directions(self):
@@ -99,11 +118,11 @@ class GameAI(Game):
         :param action (AgentAction): turn_eft, turn_right or turn_straight
         """
         match action:
-            case AgentAction.turn_left:
+            case [1, 0, 0]:
                 self.index_of_curr_direction += 1
-            case AgentAction.turn_right:
+            case [0, 0, 1]:
                 self.index_of_curr_direction -= 1
-            case AgentAction.stay_straight:
+            case [0, 1, 0]:
                 pass
         # Squash the index into the length of the direction list
         self.index_of_curr_direction = self.index_of_curr_direction % len(self.direction)
@@ -127,8 +146,11 @@ class GameAI(Game):
         if not self.game_running:
             return -10
         if self.snake_ate:
+            self.score += 1
             self.snake_ate = False
             return 10
+        else:
+            return 0
 
     def __check_frame_iterations(self):
         """
