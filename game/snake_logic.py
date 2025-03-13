@@ -1,6 +1,6 @@
 import config
-from game_utils.direction import is_opposite_dir
-from sprites.sprite_utils import WIGGLE_L
+from game.direction import is_opposite_dir
+from gui.sprites.sprite_utils import WIGGLE_L
 
 
 class SnakeLogic:

@@ -1,6 +1,11 @@
-from game_utils.direction import Direction, Collision
-from sprites.snake_sprite import SnakeSprite
-from sprites.sprite_utils import get_sprite_dir, get_sprite_wiggle, WIGGLE_L, WIGGLE_R
+from game.direction import Direction, Collision
+from gui.sprites.snake_sprite import SnakeSprite
+from gui.sprites.sprite_utils import (
+    get_sprite_dir,
+    get_sprite_wiggle,
+    WIGGLE_L,
+    WIGGLE_R,
+)
 from utils import get_random_time, get_time_ms
 
 # time is in milliseconds

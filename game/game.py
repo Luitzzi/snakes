@@ -1,13 +1,13 @@
 import pygame
 
 import config
-from gui_utils import GuiUtils
-from game_utils.direction import Direction, Collision
-from game_utils.food_logic import FoodLogic
-from game_utils.game_states import GameStates
-from game_utils.snake_logic import SnakeLogic
+from gui.gui_utils import GuiUtils
+from game.direction import Direction, Collision
+from game.food_logic import FoodLogic
+from game.game_states import GameStates
+from game.snake_logic import SnakeLogic
 from gui.drawers.snake_drawer import SnakeDrawer, calc_direction
-from sprites.food_sprite import FoodSprite
+from gui.sprites.food_sprite import FoodSprite
 
 
 class Game:

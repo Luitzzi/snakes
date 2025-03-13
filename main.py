@@ -1,5 +1,5 @@
 import pygame
-from game_utils.game import Game
+from game.game import Game
 
 
 def main():

@@ -3,7 +3,7 @@ import os
 import pygame
 
 import config
-from game_utils.direction import Direction
+from game.direction import Direction
 
 
 WIGGLE_L = 0

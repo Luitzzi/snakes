@@ -1,5 +1,9 @@
-from sprites.sprite_utils import load_spritesheet
-from sprites.sprite_utils import Sprite, SpriteVariant, SpriteVariantList
+from gui.sprites.sprite_utils import (
+    load_spritesheet,
+    Sprite,
+    SpriteVariant,
+    SpriteVariantList,
+)
 
 
 class SnakeSprite:
