@@ -18,11 +18,7 @@ class Game:
     - Game states: game_active, game_over, TODO Landing Page
     """
 
-    def __init__(self, field_width, field_height, food_logic = None):
-        # food_logic used for dependency injection when testing
-        self.screen = pygame.display.set_mode(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
-        )
+    def __init__(self, field_width, field_height):
         # Setup field settings
         self.gui = GUI(field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
 
@@ -30,23 +26,19 @@ class Game:
         self.clock = pygame.time.Clock()
         self.game_running = True
         self.game_state = GameStates.title_screen
-        self.start_time = None
-        self.test_mode = False
+        self.time_alive = None
+        self.score = None
 
         # Setup game elements
         self.snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
-        #self.snake_logic = SnakeLogic(self.snake_starting_position)
-        self.snake_logic = SnakeLogic([(1,2),(0,2)])
+        self.snake_logic = SnakeLogic(self.snake_starting_position)
         self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
-        self.food_logic = food_logic or FoodLogic(self.gui.field_width, self.gui.field_height)
-        #self.food_logic.respawn(self.snake_starting_position)
-        # Test
-        self.food_logic.set_food_position((2,2))
+        self.food_logic = FoodLogic(self.snake_starting_position, self.gui.field_width, self.gui.field_height)
         self.food_sprite = FoodSprite(self.gui, self.food_logic)
 
     def run(self):
-        self.screen.fill(config.BG_COLOR)
-        self.start_time = pygame.time.get_ticks()
+        self.gui.screen.fill(config.BG_COLOR)
+        self.time_alive = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()  # Always necessary for the QUIT event
 
@@ -66,20 +58,34 @@ class Game:
 
     def __title_screen_logic(self):
         self.game_state = GameStates.game_active
-        self.start_time = pygame.time.get_ticks()  # Necessary to evaluate the score
+        self.time_alive = pygame.time.get_ticks()  # Necessary after the change to game_active to evaluate the score
+        self.score = 0
 
     def _game_active_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
+        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._update_state()
-        self._draw()
+        self._draw_field_objects()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, self.gui.field_rect)
-        self._draw()
+        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
+        self._draw_field_objects()
+        self.__render_game_over_text()
         pygame.display.flip()
         self.clock.tick(config.FPS)
+
+    def __render_game_over_text(self):
+        time_alive_text = self.gui.text.render('Time alive:  ' + str(self.time_alive), True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(time_alive_text, self.gui.offset_x + time_alive_text.get_width() // 2 + 5,
+                                     time_alive_text.get_height() + 5)
+        score_text = self.gui.text.render('Score:  ' + str(self.score), True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(score_text, self.gui.offset_x + score_text.get_width() // 2 + 5,
+                                     time_alive_text.get_height() + score_text.get_height() + 10)
+        game_over_text = self.gui.heading.render('Game Over', True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(game_over_text, self.gui.screen_width // 2, self.gui.screen_height // 4)
+        restart_text = self.gui.subheading.render('press space', True, config.TEXT_COLOR, None)
+        self.gui.draw_element_screen(restart_text, self.gui.screen_width // 2, self.gui.screen_height // 2)
 
     #########
     # Handle input events
@@ -119,8 +125,10 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
-                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic(self.snake_starting_position)
+                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic()
                 self.game_state = GameStates.game_active
+                self.time_alive = pygame.time.get_ticks()
+                self.score = 0
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
                 self.game_running = False
 
@@ -138,6 +146,7 @@ class Game:
         new_head = self.snake_logic.move()
         if self._is_collision(new_head):
             self.game_state = GameStates.game_over
+            self.time_alive = self.get_time_alive()
         self._handle_eating()
 
     def _is_collision(self, new_head):
@@ -154,13 +163,18 @@ class Game:
             or new_head[1] < 0
             or new_head[1] >= self.gui.field_height
         ):
+            print("collision")
             return True
         else:
             return False
 
-    def _draw(self):
-        self.snake_sprite.draw(self.screen)
-        self.food_sprite.draw(self.screen)
+    def _draw_field_objects(self):
+        """
+        Draw all objects located on the field.
+        Snake, food.
+        """
+        self.snake_sprite.draw()
+        self.food_sprite.draw()
 
     #########
     # Helper methods
@@ -170,16 +184,17 @@ class Game:
         new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)
+            self.score += 1
         else:
             self.snake_logic.body.pop()
 
-    def get_time_since_start(self):
+    def get_time_alive(self):
         """
         Returns how long the player is playing in the game_active state
         :return: int representing the time in seconds
         """
-        if self.start_time is None:
+        if self.time_alive is None:
             return None
         else:
-            running_time_millis = pygame.time.get_ticks() - self.start_time
+            running_time_millis = pygame.time.get_ticks() - self.time_alive
             return running_time_millis // 1000

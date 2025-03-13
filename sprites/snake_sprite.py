@@ -9,6 +9,6 @@ class SnakeSprite(pygame.sprite.Sprite):
         self.gui = gui
         self.snake_logic = snake_logic
 
-    def draw(self, screen):
+    def draw(self):
         for segment in self.snake_logic.body:
-            self.gui.draw_tile(screen, segment[0], segment[1], config.SNAKE_COLOR)
+            self.gui.draw_tile(segment[0], segment[1], config.SNAKE_COLOR)
