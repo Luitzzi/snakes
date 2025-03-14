@@ -4,7 +4,7 @@ import torch.optim as optim
 
 class QTrainer:
     """
-    Implements the learning functionality for the nn and handles the experience replay.
+    Implements the learning functionality for the nn and handles experience replay.
     """
 
     def __init__(self, model, learning_rate, gamma):

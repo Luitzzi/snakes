@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import config
+
 class LinearQnet(nn.Module):
 
     def __init__(self, input_size, hidden_size, output_size):
@@ -17,10 +19,13 @@ class LinearQnet(nn.Module):
         return x
 
     def save(self, file_name='model.pth'):
-        model_folder_path = './model'
-        if not os.path.exists(model_folder_path):
-            os.makedirs(model_folder_path)
+        """
+        Saves the model with its state_dict.
+        :param file_name:
+        """
+        if not os.path.exists(config.SAVE_MODEL_PATH):
+            os.makedirs(config.SAVE_MODEL_PATH)
 
-        file_name = os.path.join(model_folder_path, file_name)
+        file_name = os.path.join(config.SAVE_MODEL_PATH, file_name)
         torch.save(self.state_dict(), file_name)
 

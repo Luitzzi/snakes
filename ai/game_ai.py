@@ -145,7 +145,7 @@ class GameAI:
         :return: Snake died = -10; Snake ate = 10; Else = 0
         """
         if self.terminated:
-            return ai_config.REWARD_EATING
+            return ai_config.REWARD_TERMINATED
         if self.snake_ate:
             self.score += 1
             self.snake_ate = False

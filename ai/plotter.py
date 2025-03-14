@@ -9,12 +9,16 @@ class Plotter:
         self.mean_scores = []
         self.total_score = 0
         self.best_score = 0
-
         self.epsilon = []
+
+        self.new_record = False
 
     def update_score(self, score, num_episodes):
         if score > self.best_score:
             self.best_score = score
+            self.new_record = True
+        else:
+            self.new_record = False
 
         self.total_score += score
         self.scores.append(score)
