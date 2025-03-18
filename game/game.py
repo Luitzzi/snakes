@@ -31,7 +31,7 @@ class Game:
         self.start_time = None
 
         # Setup game elements
-        self.snake_starting_position = config.calc_starting_position(
+        self.snake_starting_position = Game.calc_starting_position(
             self.gui.field_width, self.gui.field_height
         )
         self.snake_logic = SnakeLogic(self.snake_starting_position)
@@ -194,6 +194,11 @@ class Game:
     #########
     # Helper methods
     ########
+
+    def calc_starting_position(field_width, field_height):
+        x_pos = (field_width // 4, field_height // 2)
+        y_pos = (field_width // 4 - 1, field_height // 2)
+        return (x_pos, y_pos)
 
     def _handle_eating(self):
         self.snake_logic.set_food_pos(self.food_logic.location)
