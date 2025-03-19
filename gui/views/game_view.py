@@ -1,89 +1,106 @@
 import pygame
 
-from defs import TSize
-from gui.gui_utils import coord_to_px
-from gui.sprites.field_sprite import FieldSprite
+from gui.gui_utils import to_px
 from gui.sprites.wall_sprite import WallSprite
-from gui.drawers.food_drawer import FoodDrawer
-from gui.drawers.snake_drawer import SnakeDrawer
-from gui.views.view import View
+from gui.views.field_view import FieldView
 
 
-class GameView(View):
+class GameView:
+    """
+    Responsible for rendering the whole game.
+    :param screen_res: The resolution of the screen.
+    :param padding: Padding of the field from screen borders.
+    :type padding: left, top, right, bottom
+    :param field_size: Size of the field, in tiles not pixels.
+    :type field_size: width, height
+    :param scale: The scale the rendered image gets scaled by.
+    :param snake_logic: Reference to the corresponding :class:`SnakeLogic` instance.
+    :param food_logic: Reference to the corresponding :class:`FoodLogic` instance.
+    ::
+    """
+
     field: pygame.Surface
 
-    def __init__(self, field_size: TSize, snake_logic, food_logic):
-        self.field_sprite = FieldSprite()
+    def __init__(
+        self,
+        screen_res: tuple[int, int],
+        padding: tuple[int, int, int, int],
+        field_size: tuple[int, int],
+        scale: int,
+        snake_logic,
+        food_logic,
+    ):
+        self.scale = scale
+        self.field_offset = (to_px(padding[0]), to_px(padding[1]))
         self.wall_sprite = WallSprite()
-        self.food_drawer = FoodDrawer(food_logic)
-        self.snake_drawer = SnakeDrawer(snake_logic)
-        self.field = self.__init_field(field_size)
+        self.field_view = FieldView(field_size, 1, snake_logic, food_logic)
+        self.surf = self.__create_bg(screen_res, padding, field_size)
 
-    def capture(self, scaling_dim) -> pygame.Surface:
-        surf = self.field.copy()
-        self.food_drawer.draw(surf)
-        self.snake_drawer.draw(surf)
-        surf = pygame.transform.scale(surf, scaling_dim)
+    def capture(self) -> pygame.Surface:
+        """
+        Renders the game and scales it by :attr:`self.scale`.
+        :return: The rendered image.
+        ::
+        """
+        surf = self.surf.copy()
+        field = self.field_view.capture()
+        surf.blit(field, self.field_offset)
+        surf = pygame.transform.scale_by(surf, self.scale)
         return surf
 
-    def __init_field(self, field_size) -> pygame.Surface:
-        field_res = (
-            coord_to_px(field_size.w + 2),
-            coord_to_px(field_size.h + 2),
-        )
-        field = pygame.Surface(field_res)
-        self.__draw_field(field, field_size)
-        return field
+    def __create_bg(
+        self,
+        res: tuple[int, int],
+        padding: tuple[int, int, int, int],
+        field_size: tuple[int, int],
+    ) -> pygame.Surface:
+        """
+        Creates the background sprite for the game, including the walls around the field.
+        :param res: The resolution of the screen.
+        :param padding: Padding of the field from screen borders.
+        :type padding: left, top, right, bottom
+        :param field_size: Size of the field, in tiles not pixels.
+        :type field_size: width, height
+        :return: The resulting sprite.
+        ::
+        """
+        # coordinates of the borders of the field
+        left = to_px(padding[0] - 1)
+        top = to_px(padding[1] - 1)
+        right = to_px(padding[0] + field_size[0])
+        bottom = to_px(padding[1] + field_size[1])
 
-    def __draw_field(self, field, size) -> None:
-        # draw corners
-        left = coord_to_px(0)
-        top = coord_to_px(0)
-        right = coord_to_px(size.w + 1)
-        bottom = coord_to_px(size.h + 1)
+        # draw bg
+        surf = pygame.Surface(res)
+        for i in range(padding[1] + field_size[1] + padding[3]):
+            for j in range(padding[0] + field_size[0] + padding[2]):
+                pos = (to_px(j), to_px(i))
+                surf.blit(self.wall_sprite.bg, pos)
+
+        #   walls
         pos = (left, top)
-        field.blit(self.wall_sprite.bg, pos)
-        field.blit(self.wall_sprite.top_left, pos)
+        surf.blit(self.wall_sprite.top_left, pos)
         pos = (right, top)
-        field.blit(self.wall_sprite.bg, pos)
-        field.blit(self.wall_sprite.top_right, pos)
+        surf.blit(self.wall_sprite.top_right, pos)
         pos = (left, bottom)
-        field.blit(self.wall_sprite.bg, pos)
-        field.blit(self.wall_sprite.bot_left, pos)
-        pos = (left, bottom)
-        field.blit(self.wall_sprite.bg, pos)
-        field.blit(self.wall_sprite.bot_right, pos)
+        surf.blit(self.wall_sprite.bot_left, pos)
+        pos = (right, bottom)
+        surf.blit(self.wall_sprite.bot_right, pos)
 
-        # draw top and bottom wall
-        for i in range(size.w):
-            y = coord_to_px(i + 1)
-            pos_top = (left, y)
-            field.blit(self.wall_sprite.bg, pos_top)
-            field.blit(self.wall_sprite.left, pos_top)
-            pos_bot = (right, y)
-            field.blit(self.wall_sprite.bg, pos_bot)
-            field.blit(self.wall_sprite.right, pos_bot)
+        #   top and bottom wall
+        for i in range(field_size[0]):
+            x = left + to_px(i + 1)
+            pos_top = (x, top)
+            surf.blit(self.wall_sprite.top, pos_top)
+            pos_bot = (x, bottom)
+            surf.blit(self.wall_sprite.bot, pos_bot)
 
-        # draw left and right wall
-        for i in range(size.h):
-            x = coord_to_px(i + 1)
-            pos_left = (x, top)
-            field.blit(self.wall_sprite.bg, pos_left)
-            field.blit(self.wall_sprite.left, pos_left)
-            pos_right = (x, bottom)
-            field.blit(self.wall_sprite.bg, pos_right)
-            field.blit(self.wall_sprite.bot, pos_right)
+        #   left and right wall
+        for i in range(field_size[1]):
+            y = top + to_px(i + 1)
+            pos_left = (left, y)
+            surf.blit(self.wall_sprite.left, pos_left)
+            pos_right = (right, y)
+            surf.blit(self.wall_sprite.right, pos_right)
 
-        # draw grass
-        for i in range(size.h):
-            for j in range(size.w):
-                if (i + j) % 2 == 0:
-                    spr = self.field_sprite.dark
-                else:
-                    spr = self.field_sprite.light
-                pos = (coord_to_px(j + 1), coord_to_px(i + 1))
-                field.blit(spr, pos)
-
-    ##########
-    # Static #
-    ##########
+        return surf

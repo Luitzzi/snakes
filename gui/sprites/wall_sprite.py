@@ -2,6 +2,11 @@ from gui.sprites.sprite_utils import load_spritesheet
 
 
 class WallSprite:
+    """
+    Holds all Sprites for the walls.
+    .
+    """
+
     def __init__(self):
         sprites = load_spritesheet("walls")
         self.top_left = sprites[0][0]

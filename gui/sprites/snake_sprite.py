@@ -7,6 +7,11 @@ from gui.sprites.sprite_utils import (
 
 
 class SnakeSprite:
+    """
+    Holds all Sprites for the snake.
+    .
+    """
+
     def __init__(self):
         sprites = load_spritesheet("snake")
         self.head = SpriteVariant(sprites[0][0])

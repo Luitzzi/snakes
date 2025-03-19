@@ -1,5 +1,7 @@
+import pygame
+
 from defs import Collision, Direction
-from gui.gui_utils import coord_to_px, overlay_sprite
+from gui.gui_utils import to_px, overlay_sprite
 from gui.sprites.snake_sprite import SnakeSprite
 from gui.sprites.sprite_utils import (
     get_sprite_dir,
@@ -17,6 +19,12 @@ DIZZY_SPEED = 100  # time each frame of animation is shown
 
 
 class SnakeDrawer:
+    """
+    Responsible for drawing the desired sprites of the snake.
+    :param snake_logic: Reference to the corresponding :class:`SnakeLogic` instance.
+    ::
+    """
+
     def __init__(self, snake_logic):
         self.logic = snake_logic
         self.sprites = SnakeSprite()
@@ -27,7 +35,11 @@ class SnakeDrawer:
         self.last_dizzy_change = None
         self.has_eaten: int = 0
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface) -> None:
+        """
+        Draws sprites to the :attr:`screen`.
+        :return: Noting.
+        """
         last_index = len(self.logic.body) - 1
         for i in range(len(self.logic.body) - 1, -1, -1):
             segment = self.logic.body[i]
@@ -40,24 +52,34 @@ class SnakeDrawer:
             else:
                 spr = self.animate_body(i, segment, wiggle)
 
-            pos = (coord_to_px(segment[0] + 1), coord_to_px(segment[1] + 1))
+            pos = (to_px(segment[0]), to_px(segment[1]))
             screen.blit(spr, pos)
 
-    def animate_head(self):
+    def animate_head(self) -> pygame.Surface:
+        """
+        Selecting the correct sprite or animation for the head.
+        :return: The selected sprite.
+        ::
+        """
         if self.logic.collided_with is None:
-            spr = get_sprite_dir(self.logic.direction, self.get_head_sprite())
-            if self.check_normal_blink():
+            spr = get_sprite_dir(self.logic.direction, self.eating_animation())
+            if self.check_blink():
                 eyelids = get_sprite_dir(self.logic.direction, self.sprites.eyelids)
                 spr = overlay_sprite(spr, eyelids)
         else:
             if self.collision_time is None:
                 self.collision_time = get_time_ms()
                 self.last_dizzy_change = self.collision_time + DIZZY_OFFSET
-            spr = self.animate_collision()
+            spr = self.collision_animation()
 
         return spr
 
-    def get_head_sprite(self):
+    def eating_animation(self) -> pygame.Surface:
+        """
+        Selecting the correct sprite of the head for the eating animation.
+        :return: The selected sprite.
+        ::
+        """
         if self.logic.is_food_ahead():
             self.has_eaten = 3
             return self.sprites.mouth
@@ -70,7 +92,12 @@ class SnakeDrawer:
         else:
             return self.sprites.head
 
-    def animate_collision(self):
+    def collision_animation(self) -> pygame.Surface:
+        """
+        Selecting the correct sprite of the head for the colliding animation.
+        :return: The selected sprite.
+        ::
+        """
         if get_time_ms() - self.collision_time <= DIZZY_OFFSET:
             if self.logic.collided_with.val() == self.logic.prev_direction.val():
                 return get_sprite_dir(self.logic.direction, self.sprites.hit_wall)
@@ -83,13 +110,17 @@ class SnakeDrawer:
                 case Collision.TAIL:
                     return self.get_hit_tail_spr()
                 case Collision.LEFT:
-                    return self.animate_side_collision(Direction.NORTH, Direction.SOUTH)
+                    return self.side_collision_animation(
+                        Direction.NORTH, Direction.SOUTH
+                    )
                 case Collision.TOP:
-                    return self.animate_side_collision(Direction.EAST, Direction.WEST)
+                    return self.side_collision_animation(Direction.EAST, Direction.WEST)
                 case Collision.RIGHT:
-                    return self.animate_side_collision(Direction.SOUTH, Direction.NORTH)
+                    return self.side_collision_animation(
+                        Direction.SOUTH, Direction.NORTH
+                    )
                 case Collision.TOP:
-                    return self.animate_side_collision(Direction.WEST, Direction.EAST)
+                    return self.side_collision_animation(Direction.WEST, Direction.EAST)
                 case _:
                     print("Collison collided_with has unexpected value")
         else:
@@ -113,7 +144,16 @@ class SnakeDrawer:
 
             return overlay_sprite(spr, dizzy_eyes[self.dizzy_index])
 
-    def animate_side_collision(self, dir_1, dir_2):
+    def side_collision_animation(
+        self, dir_1: Direction, dir_2: Direction
+    ) -> pygame.Surface:
+        """
+        Selecting the correct sprite of the head for the side colliding animation.
+        :param dir_1: The first direction the snake could have been travelling before hitting the wall.
+        :param dir_2: The second direction the snake could have been travelling before hitting the wall.
+        :return: The selected sprite.
+        ::
+        """
         spr = self.sprites.hit_side
         if self.logic.prev_direction == dir_1:
             spr = get_sprite_wiggle(WIGGLE_L, spr)
@@ -125,7 +165,18 @@ class SnakeDrawer:
             )
         return get_sprite_dir(self.logic.prev_direction, spr)
 
-    def animate_body(self, i, segment, wiggle):
+    def animate_body(
+        self, i: int, segment: tuple[int, int], wiggle: int
+    ) -> pygame.Surface:
+        """
+        Selecting the correct sprite for the body.
+        :param i: Index of the current segment in :attr:`self.logic.body`.
+        :param segment: Position of the current segment.
+        :type segment: x, y
+        :param wiggle: The wiggle-direction for the current segment.
+        :return: The selected sprite.
+        ::
+        """
         first_dir = calc_direction(self.logic.body[i - 1], segment)
         second_dir = calc_direction(segment, self.logic.body[i + 1])
         if first_dir == second_dir:
@@ -136,13 +187,29 @@ class SnakeDrawer:
             spr = get_sprite_dir(direction, self.sprites.curve)
         return spr
 
-    def animate_tail(self, i, segment, wiggle):
+    def animate_tail(
+        self, i: int, segment: tuple[int, int], wiggle: int
+    ) -> pygame.Surface:
+        """
+        Selecting the correct sprite for the tail.
+        :param i: Index of the tail in :attr:`self.logic.body`.
+        :param segment: Position of the tail.
+        :type segment: x, y
+        :param wiggle: The wiggle-direction for the tail.
+        :return: The selected sprite.
+        ::
+        """
         direction = calc_direction(self.logic.body[i - 1], segment)
         spr = get_sprite_wiggle(wiggle, self.sprites.tail)
         spr = get_sprite_dir(direction, spr)
         return spr
 
-    def get_hit_tail_spr(self):
+    def get_hit_tail_spr(self) -> pygame.Surface:
+        """
+        Getting the correct sprite for the head hitting the tail.
+        :return: The selected sprite.
+        ::
+        """
         wiggle = WIGGLE_L
         tail_dir = calc_direction(self.logic.body[-2], self.logic.body[0])
         if (
@@ -156,7 +223,12 @@ class SnakeDrawer:
         spr = get_sprite_dir(self.logic.direction, spr)
         return spr
 
-    def get_hit_curve_sprite(self):
+    def get_hit_curve_sprite(self) -> pygame.Surface:
+        """
+        Getting the correct sprite for the head hitting a curve of the body.
+        :return: The selected sprite.
+        ::
+        """
         wiggle = WIGGLE_L
         i = self.logic.body[1:].index(self.logic.body[0]) + 1
         first_dir = calc_direction(self.logic.body[i - 1], self.logic.body[i])
@@ -173,18 +245,26 @@ class SnakeDrawer:
         spr = get_sprite_dir(self.logic.direction, spr)
         return spr
 
-    def check_blink(self, range_):
+    def check_blink(self) -> bool:
+        """
+        Checks if snake needs to blink
+        and also resets timer and the random interval :attr:`self.blink_wait`.
+        :return: Whehter to blink or not.
+        ::
+        """
         if get_time_ms() - self.last_blink >= self.blink_wait:
-            self.blink_wait = get_random_time(range_)
+            self.blink_wait = get_random_time(BLINK_RANGE)
             self.last_blink = get_time_ms()
             return True
 
         return get_time_ms() - self.last_blink <= BLINK_DURATION
 
-    def check_normal_blink(self):
-        return self.check_blink(BLINK_RANGE)
-
-    def set_logic(self, logic):
+    def set_logic(self, logic) -> None:
+        """
+        Sets a new :class:`SnakeLogic` reference and resets some other stuff.
+        :param logic: Reference of a :class:`SnakeLogic` instance.
+        :return: Nothing.
+        """
         self.logic = logic
         self.collided_with = None
         self.collision_time = None
@@ -192,7 +272,18 @@ class SnakeDrawer:
         self.last_dizzy_change = None
 
 
-def calc_direction(prev, curr):
+def calc_direction(prev: tuple[int, int], curr: tuple[int, int]) -> Direction:
+    """
+    A function for calculating a :class:`Direction` between :attr:`prev` and :attr:`curr`.
+    Forgot what exactly the resulting :class:`Direction` means, and I'm too lazy to find out.
+    It works so it's ok, probably don't touch again.
+    :param prev: The previous position.
+    :type prev: x, y
+    :param curr: The current position.
+    :type curr: x, y
+    :return: The calculated :class:`Direction`
+    ::
+    """
     delta = curr[0] - prev[0]
     if delta > 0:
         return Direction.WEST
@@ -208,7 +299,13 @@ def calc_direction(prev, curr):
             print("Error, Snake positions overlap")
 
 
-def calc_curve_dir(first_dir, second_dir):
+def calc_curve_dir(first_dir: Direction, second_dir: Direction) -> Direction:
+    """
+    Calculates the :class:`Direction` (= orientation) of the curve-sprite.
+    :param first_dir: First direction.
+    :param second_dir: Second direction.
+    :return: Calculated orientation.
+    """
     if (
         first_dir == Direction.NORTH
         and second_dir == Direction.EAST

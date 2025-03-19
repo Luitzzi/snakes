@@ -1,8 +1,8 @@
 import pygame
 
 import config
-from gui.gui_ import Gui
-from defs import Collision, Direction, TSize
+from gui.gui import Gui
+from defs import Collision, Direction
 from game.food_logic import FoodLogic
 from game.game_states import GameStates
 from game.snake_logic import SnakeLogic
@@ -18,7 +18,7 @@ class Game:
     """
 
     def __init__(self, field_width, field_height):
-        self.field_size = TSize(field_width, field_height)
+        self.field_size = (field_width, field_height)
         # Setup game logic
         self.clock = pygame.time.Clock()
         self.game_running = True
@@ -27,11 +27,11 @@ class Game:
 
         # Setup game elements
         self.snake_starting_position = Game.calc_starting_position(
-            self.field_size.w, self.field_size.h
+            self.field_size[0], self.field_size[1]
         )
         self.snake_logic = SnakeLogic(self.snake_starting_position)
         self.food_logic = FoodLogic(
-            self.snake_starting_position, self.field_size.w, self.field_size.h
+            self.snake_starting_position, self.field_size[0], self.field_size[1]
         )
         self.gui = Gui(self)
 
@@ -65,12 +65,10 @@ class Game:
     def __game_active_logic(self):
         self._update_state()
         self._draw_field_objects()
-        pygame.display.flip()
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
         self._draw_field_objects()
-        pygame.display.flip()
         self.clock.tick(config.FPS)
 
     #########
@@ -112,7 +110,7 @@ class Game:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
                 self.snake_logic = SnakeLogic(self.snake_starting_position)
-                self.snake_drawer.set_logic(self.snake_logic)
+                self.gui.game_restarted()
                 self.game_state = GameStates.game_active
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
                 self.game_running = False
@@ -166,11 +164,11 @@ class Game:
                     self.snake_logic.collide(Collision.CURVE)
         elif new_head[0] < 0:
             self.snake_logic.collide(Collision.LEFT)
-        elif new_head[0] >= self.field_size.w:
+        elif new_head[0] >= self.field_size[0]:
             self.snake_logic.collide(Collision.RIGHT)
         elif new_head[1] < 0:
             self.snake_logic.collide(Collision.TOP)
-        elif new_head[1] >= self.field_size.h:
+        elif new_head[1] >= self.field_size[1]:
             self.snake_logic.collide(Collision.BOTTOM)
         else:
             return False
@@ -186,9 +184,9 @@ class Game:
     # Helper methods
     ########
 
-    def calc_starting_position(field_width, field_height):
-        x_pos = (field_width // 4, field_height // 2)
-        y_pos = (field_width // 4 - 1, field_height // 2)
+    def calc_starting_position(width, height):
+        x_pos = (width // 4, height // 2)
+        y_pos = (width // 4 - 1, height // 2)
         return (x_pos, y_pos)
 
     def _handle_eating(self):
