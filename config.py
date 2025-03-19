@@ -5,6 +5,7 @@ from defs import Direction
 FPS = 5
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
+SCREEN_RES = (600, 400)
 
 # Sprites
 SPRITE_PATH = "./assets/sprites/"

@@ -1,8 +1,26 @@
 from enum import Enum
 
 
-# Types
-type TPos = tuple[int, int]
+# ClassTypes
+class TSize:
+    w: int
+    h: int
+
+    def __init__(self, w: int, h: int):
+        self.w = w
+        self.h = h
+
+
+class TPos:
+    x: int
+    y: int
+
+    def __init__(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+    def flat(self) -> tuple[int, int]:
+        return (self.x, self.y)
 
 
 # Enums

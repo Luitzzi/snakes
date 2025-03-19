@@ -1,4 +1,5 @@
 from defs import Collision, Direction
+from gui.gui_utils import coord_to_px, overlay_sprite
 from gui.sprites.snake_sprite import SnakeSprite
 from gui.sprites.sprite_utils import (
     get_sprite_dir,
@@ -16,8 +17,7 @@ DIZZY_SPEED = 100  # time each frame of animation is shown
 
 
 class SnakeDrawer:
-    def __init__(self, gui, snake_logic):
-        self.gui = gui
+    def __init__(self, snake_logic):
         self.logic = snake_logic
         self.sprites = SnakeSprite()
         self.last_blink = get_time_ms()
@@ -27,7 +27,7 @@ class SnakeDrawer:
         self.last_dizzy_change = None
         self.has_eaten: int = 0
 
-    def draw(self):
+    def draw(self, screen):
         last_index = len(self.logic.body) - 1
         for i in range(len(self.logic.body) - 1, -1, -1):
             segment = self.logic.body[i]
@@ -40,14 +40,15 @@ class SnakeDrawer:
             else:
                 spr = self.animate_body(i, segment, wiggle)
 
-            self.gui.draw_sprite(self.gui.screen, spr, segment[0], segment[1])
+            pos = (coord_to_px(segment[0] + 1), coord_to_px(segment[1] + 1))
+            screen.blit(spr, pos)
 
     def animate_head(self):
         if self.logic.collided_with is None:
             spr = get_sprite_dir(self.logic.direction, self.get_head_sprite())
             if self.check_normal_blink():
                 eyelids = get_sprite_dir(self.logic.direction, self.sprites.eyelids)
-                spr = self.gui.overlay_sprite(spr, eyelids)
+                spr = overlay_sprite(spr, eyelids)
         else:
             if self.collision_time is None:
                 self.collision_time = get_time_ms()
@@ -110,7 +111,7 @@ class SnakeDrawer:
                 if self.dizzy_index == len(dizzy_eyes):
                     self.dizzy_index = 0
 
-            return self.gui.overlay_sprite(spr, dizzy_eyes[self.dizzy_index])
+            return overlay_sprite(spr, dizzy_eyes[self.dizzy_index])
 
     def animate_side_collision(self, dir_1, dir_2):
         spr = self.sprites.hit_side

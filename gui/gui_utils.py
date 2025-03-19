@@ -3,6 +3,29 @@ import pygame
 import config
 
 
+def coord_to_px(coord: int) -> int:
+    """
+    calculates pixel value for given coord
+    """
+    return coord * config.SPRITE_SIZE
+
+
+def overlay_sprite(base: pygame.Surface, top: pygame.Surface):
+    base = base.copy()
+    base.blit(top, (0, 0))
+    return base
+
+
+def calc_scaling_dim(dim, res) -> tuple[int, int]:
+    # aspect ratio of original dimension is longer on width compared to resolution
+    if dim[0] / dim[1] > res[0] / res[1]:
+        factor = float(res[0]) / dim[0]
+    else:
+        factor = float(res[1]) / dim[1]
+
+    return (int(dim[0] * factor), int(dim[1] * factor))
+
+
 class GuiUtils:
     def __init__(self, field_width, field_height, screen_width, screen_height):
         self.field_width = field_width
@@ -39,11 +62,6 @@ class GuiUtils:
 
     def draw_sprite(self, screen, sprite, x, y):
         screen.blit(self.scale_sprite(sprite), (self.__calc_x(x), self.__calc_y(y)))
-
-    def overlay_sprite(self, base, top):
-        base = base.copy()
-        base.blit(top, (0, 0))
-        return base
 
     def draw_element_field(self, element, x, y):
         """

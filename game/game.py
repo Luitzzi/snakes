@@ -1,13 +1,12 @@
 import pygame
 
 import config
-from gui.gui_utils import GuiUtils
-from defs import Direction, Collision
+from gui.gui_ import Gui
+from defs import Collision, Direction, TSize
 from game.food_logic import FoodLogic
 from game.game_states import GameStates
 from game.snake_logic import SnakeLogic
-from gui.drawers.snake_drawer import SnakeDrawer, calc_direction
-from gui.sprites.food_sprite import FoodSprite
+from gui.drawers.snake_drawer import calc_direction
 
 
 class Game:
@@ -19,11 +18,7 @@ class Game:
     """
 
     def __init__(self, field_width, field_height):
-        # Setup field settings
-        self.gui = GuiUtils(
-            field_width, field_height, config.SCREEN_WIDTH, config.SCREEN_HEIGHT
-        )
-
+        self.field_size = TSize(field_width, field_height)
         # Setup game logic
         self.clock = pygame.time.Clock()
         self.game_running = True
@@ -32,17 +27,15 @@ class Game:
 
         # Setup game elements
         self.snake_starting_position = Game.calc_starting_position(
-            self.gui.field_width, self.gui.field_height
+            self.field_size.w, self.field_size.h
         )
         self.snake_logic = SnakeLogic(self.snake_starting_position)
-        self.snake_drawer = SnakeDrawer(self.gui, self.snake_logic)
         self.food_logic = FoodLogic(
-            self.snake_starting_position, self.gui.field_width, self.gui.field_height
+            self.snake_starting_position, self.field_size.w, self.field_size.h
         )
-        self.food_sprite = FoodSprite(self.gui, self.food_logic)
+        self.gui = Gui(self)
 
     def run(self):
-        self.gui.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()  # Always necessary for the QUIT event
@@ -55,6 +48,8 @@ class Game:
                 self.__game_active_logic()
             elif self.game_state == GameStates.game_over:
                 self.__game_over_logic()
+
+            self.gui.draw()
         pygame.quit()
 
     #########
@@ -68,14 +63,12 @@ class Game:
         )  # Necessary after the change to game_active to evaluate the score
 
     def __game_active_logic(self):
-        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._update_state()
         self._draw_field_objects()
         pygame.display.flip()
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
-        pygame.draw.rect(self.gui.screen, config.FIELD_COLOR, self.gui.field_rect)
         self._draw_field_objects()
         pygame.display.flip()
         self.clock.tick(config.FPS)
@@ -173,11 +166,11 @@ class Game:
                     self.snake_logic.collide(Collision.CURVE)
         elif new_head[0] < 0:
             self.snake_logic.collide(Collision.LEFT)
-        elif new_head[0] >= self.gui.field_width:
+        elif new_head[0] >= self.field_size.w:
             self.snake_logic.collide(Collision.RIGHT)
         elif new_head[1] < 0:
             self.snake_logic.collide(Collision.TOP)
-        elif new_head[1] >= self.gui.field_height:
+        elif new_head[1] >= self.field_size.h:
             self.snake_logic.collide(Collision.BOTTOM)
         else:
             return False
@@ -188,8 +181,6 @@ class Game:
         Draw all objects located on the field.
         Snake, food.
         """
-        self.snake_drawer.draw()
-        self.food_sprite.draw()
 
     #########
     # Helper methods
