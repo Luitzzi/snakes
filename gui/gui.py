@@ -12,6 +12,24 @@ class Gui:
     ::
     """
 
+    @staticmethod
+    def calc_screen_res(
+            field_size: tuple[int, int], padding: tuple[int, int, int, int], scale
+    ) -> tuple[int, int]:
+        """
+        Calculates the resolution of the window from the given parameters.
+        :param padding: Padding of the field from screen borders.
+        :type padding: left, top, right, bottom
+        :param field_size: Size of the field, in tiles not pixels.
+        :type field_size: width, height
+        :param scale: The scale the rendered image gets scaled by.
+        :return: The calculated Resolution.
+        ::
+        """
+        width = to_px(padding[0] + field_size[0] + padding[2]) * scale
+        height = to_px(padding[1] + field_size[1] + padding[3]) * scale
+        return width, height
+
     def __init__(self, game_logic):
         padding = (5, 2, 5, 2)
         scale = 3
@@ -30,7 +48,7 @@ class Gui:
     def draw(self) -> None:
         """
         Renders everything to the screen.
-        :returns: Nothing.
+        :return: Nothing.
         ::
         """
         view = self.game_view.capture()
@@ -41,27 +59,10 @@ class Gui:
         """
         Hook to tell Gui when the game is restarted,
         so it can update the snake_logic reference of the snake_drawer.
-        :returns: Nothing.
+        :return: Nothing.
         ::
         """
         self.game_view.field_view.snake_drawer.set_logic(self.game_logic.snake_logic)
-
-    def calc_screen_res(
-        field_size: tuple[int, int], padding: tuple[int, int, int, int], scale
-    ) -> tuple[int, int]:
-        """
-        Calculates the resolution of the window from the given parameters.
-        :param padding: Padding of the field from screen borders.
-        :type padding: left, top, right, bottom
-        :param field_size: Size of the field, in tiles not pixels.
-        :type field_size: width, height
-        :param scale: The scale the rendered image gets scaled by.
-        :return: The calculated Resolution.
-        ::
-        """
-        width = to_px(padding[0] + field_size[0] + padding[2]) * scale
-        height = to_px(padding[1] + field_size[1] + padding[3]) * scale
-        return (width, height)
 
     def __init_fonts(self):
         """
