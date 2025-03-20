@@ -5,9 +5,8 @@ from game.game_objects.direction import is_opposite_dir
 class SnakeLogic:
     default_direction = config.SNAKE_DEFAULT_DIRECTION
 
-    def __init__(self, starting_position):
-        # copies the list, so the one from config is not modified when modifying body
-        self.body = list(starting_position)
+    def __init__(self, starting_position: tuple[int, int]):
+        self.body = [starting_position, (starting_position[0] - 1, starting_position[1])]
         self.direction = self.default_direction
         self.new_direction = self.default_direction
         self.next_new_direction = self.default_direction

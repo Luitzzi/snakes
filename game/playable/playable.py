@@ -2,6 +2,7 @@ from typing import List
 from abc import ABC, abstractmethod
 
 from game.game_state import GameState
+from game.player.player import Player
 
 
 class Playable(ABC):
@@ -18,3 +19,4 @@ class Playable(ABC):
         """
         Execute on play_step and update the game logic
         """
+

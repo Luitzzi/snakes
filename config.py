@@ -8,6 +8,8 @@ from game.game_objects.direction import Direction
 FPS = 5
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
+DEFAULT_FIELD_WIDTH = 15
+DEFAULT_FIELD_HEIGHT = 15
 SCREEN_RES = (600, 400)
 
 # Sprites

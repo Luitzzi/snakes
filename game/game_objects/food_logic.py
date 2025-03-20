@@ -2,13 +2,14 @@ import random
 
 
 class FoodLogic:
-    def __init__(self, snake_starting_position, field_width, field_height):
-        self.field_width = field_width
-        self.field_height = field_height
+    def __init__(self, field_size: tuple[int, int]):
+        self.field_width = field_size[0]
+        self.field_height = field_size[1]
         self.location = None
-        self.respawn(snake_starting_position)
+        self.respawn()
 
-    def respawn(self, snake_body):
+    def respawn(self, snake_body=[(-1,-1)]):
+        #TODO: Implement that the food can't spawn in the body of the snake
         valid_location = False
         while not valid_location:
             new_location = (

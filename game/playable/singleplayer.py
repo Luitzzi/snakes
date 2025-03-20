@@ -1,71 +1,84 @@
-from typing import override
+from typing import override, List
 
 import pygame
 
-import config
-from game.game_objects.direction import Direction
-from game.game_objects.snake_logic import SnakeLogic
 from game.game_objects.food_logic import FoodLogic
 from game.game_state import GameState
 from game.playable.playable import Playable
+from game.player.player import Player
+from game.player.human import Human
 
 class Singleplayer(Playable):
+    """
+    Game-mode Singleplayer:
+    One Human plays against multiple optional enemies.
+    The enemies can be controlled by an AI-Agent or Algorithm.
+    The Player objects have the SnakeLogic as an Attribute,
+    while the food is handled at the Singleplayer-class level.
+    """
+    time_alive: int
+    score: int
 
-    def __init__(self):
-        self.clock = pygame.time.Clock()
+    player: Human
+    enemies: List[Player]
+    field_size: tuple[int, int]
+    food_logic: FoodLogic
+
+    def __init__(self, player: Player, enemies: List[Player], field_size: tuple[int, int]):
         self.time_alive = None
         self.score = None
 
-        self.snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
-        self.snake_logic = SnakeLogic(self.snake_starting_position)
-        self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
-        self.food_logic = FoodLogic(self.snake_starting_position, self.gui.field_width, self.gui.field_height)
-        self.food_sprite = FoodSprite(self.gui, self.food_logic)
+        self.player = player
+        self.enemies = enemies
+        self.field_size = field_size
+
+        self.food_logic = FoodLogic(self.field_size)
+        # TODO: Implement that the food can't spawn in the body of any snake.
 
     @override
     def play_step(self) -> GameState:
         """
         Update the game-state:
-        - Make the move based on the direction saved in snake_logic
-        - Check if the move results in a collision
-        - Check if snake eats
+        - Execute all actions: Of the real player as well as all computer-agents.
+        - Check if any snake ate the food
+        - Check if any snake collided and update the is_alive attribute
+          of the SnakeLogic inside the corresponding Player.
+        - Check if a snake ate the food and update everything accordingly.
         """
-        self.snake_logic.move()
+        self.execute_all_actions()
+        self.handle_eating()
+        new_game_state = self.check_for_collisions()
+        return new_game_state
 
-        if self._is_collision():
+    def execute_all_actions(self) -> None:
+        self.player.execute_action()
+
+        for enemy in self.enemies:
+            action = enemy.get_action()
+            enemy.execute_action(action)
+
+    def handle_eating(self) -> None:
+        for snake in self.player or self.enemies:
+            if snake.did_eat(self.food_logic.location):
+                self.food_logic.respawn()
+
+    def check_for_collisions(self) -> GameState:
+        """
+        Check first if the player collided. This would end the game.
+        Then check if any enemy collided. On collision the is_alive attribute
+        of the player is set to False.
+        Because of that it the Player won't perform any play_steps anymore.
+        :return: State of the game. If collision occurred: GAME_OVER, else PLAYING.
+        """
+        if self.player.is_collision(self.field_size):
             self.time_alive = self.get_time_alive()
             return GameState.GAME_OVER
 
-        self._handle_eating()
+        for enemy in self.enemies:
+            enemy.is_collision(self.field_size) # TODO: Implement respawn timer. Currently the snake just stays dead.
         return GameState.PLAYING
 
-    def _is_collision(self):
-        """
-        Check if the new_head results in a collision.
-        The parameter is necessary to get the danger-moves in the training of the AI.
-        :return: bool: True if collision occurred, False if not
-        """
-        new_head = self.snake_logic.get_head()
-        if (
-                new_head in self.snake_logic.body[1:]
-                or new_head[0] < 0
-                or new_head[0] >= self.gui.field_width
-                or new_head[1] < 0
-                or new_head[1] >= self.gui.field_height
-        ):
-            return True
-        else:
-            return False
-
-    def _handle_eating(self):
-        new_head = self.snake_logic.get_head()
-        if new_head == self.food_logic.location:
-            self.food_logic.respawn(self.snake_logic.body)
-            self.score += 1
-        else:
-            self.snake_logic.body.pop()
-
-    def get_time_alive(self):
+    def get_time_alive(self) -> int:
         """
         Returns how long the player is playing in the game_active state
         :return: int representing the time in seconds

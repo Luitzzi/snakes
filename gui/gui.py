@@ -8,7 +8,7 @@ from gui.views.game_view import GameView
 class Gui:
     """
     Handles everything gui related.
-    :param game_logic: Reference to the :class:`Game` instance where :class:`Gui` is instanciated.
+    :param game_manager: Reference to the :class:`Game` instance where :class:`Gui` is instanciated.
     ::
     """
 
@@ -30,20 +30,20 @@ class Gui:
         height = to_px(padding[1] + field_size[1] + padding[3]) * scale
         return width, height
 
-    def __init__(self, game_logic):
+    def __init__(self, game_manager):
         padding = (5, 2, 5, 2)
         scale = 3
-        screen_res = Gui.calc_screen_res(game_logic.field_size, padding, scale)
+        screen_res = Gui.calc_screen_res(game_manager.field_size, padding, scale)
         self.screen = pygame.display.set_mode(screen_res)
         self.game_view = GameView(
             screen_res,
             padding,
-            game_logic.field_size,
+            game_manager.field_size,
             scale,
-            game_logic.snake_logic,
-            game_logic.food_logic,
+            game_manager.snake_logic,
+            game_manager.food_logic,
         )
-        self.game_logic = game_logic
+        self.game_logic = game_manager
 
     def draw(self) -> None:
         """
