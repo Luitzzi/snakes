@@ -46,7 +46,7 @@ class Game:
             if self.game_state == GameStates.title_screen:
                 self.__title_screen_logic()
             elif self.game_state == GameStates.game_active:
-                self._game_active_logic()
+                self.__game_active_logic()
             elif self.game_state == GameStates.game_over:
                 self.__game_over_logic()
 
@@ -172,7 +172,7 @@ class Game:
                 self.snake_logic.body.pop(0)
                 self.snake_logic.body.append(old_tail)
 
-    def _is_collision(self):
+    def _is_collision(self, new_head):
         """
         Check if the new_head results in a collision.
         Also passes collision information to SnakeLogic.

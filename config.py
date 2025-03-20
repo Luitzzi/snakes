@@ -5,7 +5,7 @@ from defs import Direction
 # General settings #
 ####################
 
-FPS = 50
+FPS = 5
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 SCREEN_RES = (600, 400)
