@@ -57,21 +57,6 @@ class Agent:
         states, actions, rewards, next_states, done = zip(*mini_sample)
         self.trainer.train_step(states, actions, rewards, next_states, done)
 
-    def get_state(self):
-        """
-        Returns the current state of the environment as a numpy array
-        with 11 values:
-        [is_danger_left, is_danger_straight, is_danger_right
-         north, east, south, west, <- current direction
-         north, east, south, west] <- food direction
-        :return: numpy array of bools represented by 0 and 1 with 11 values
-        """
-        danger_positions = self.__get_danger_positions()
-        current_direction = self.__get_current_direction()
-        food_direction = self.__get_direction_of_food()
-
-        state = danger_positions + current_direction + food_direction
-        return np.array(state, dtype=int)
 
     def get_action(self, state):
         """

@@ -2,17 +2,18 @@ import pygame
 
 from event_handling.event_manager import EventManager
 from event_handling.event_types import EventType
+from game.game_manager import GameManager
 
 def game_loop() -> None:
-    event_manager = EventManager()
-    game_state_manager = GameStateManager(event_manager)
-    gui = GUI()
     pygame.init()
+    event_manager = EventManager()
+    game_manager = GameManager(event_manager)
+    gui = GUI(game_manager)
 
     running = True
     while running:
         handle_events(event_manager)
-        game_state_manager.update()
+        game_manager.update()
         gui.render()
 
 
@@ -24,7 +25,7 @@ def handle_events(event_manager: EventManager) -> None:
 
         if event.type == pygame.KEYDOWN:
             # Game running events
-            if event.key == pygame.K_UP or event.key == pygame.K_w:
+            if event.key in (pygame.K_UP, pygame.K_w):
                 event_manager.dispatch(EventType.INPUT_EVENT.UP)
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 event_manager.dispatch(EventType.INPUT_EVENT.RIGHT)
