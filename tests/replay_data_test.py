@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-
 from db.game_statistics import GameStatistics
 
 class TestReplay(unittest.TestCase):
@@ -28,6 +27,4 @@ class TestReplay(unittest.TestCase):
         np.testing.assert_array_equal(self.game_stats.food_positions[:self.game_stats.num_food_positions * 2],
                                       [1, 1, 2, 2, 3, 3, 4, 4],
                                       "Error food_positions")
-
-
 

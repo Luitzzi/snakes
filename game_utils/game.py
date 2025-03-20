@@ -30,7 +30,7 @@ class Game:
         self.score = None
 
         # Setup game elements
-        self.snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height)
+        self.snake_starting_position = config.calc_starting_position(self.gui.field_width, self.gui.field_height) # TODO: startpos nur als x,y
         self.snake_logic = SnakeLogic(self.snake_starting_position)
         self.snake_sprite = SnakeSprite(self.gui, self.snake_logic)
         self.food_logic = FoodLogic(self.snake_starting_position, self.gui.field_width, self.gui.field_height)

@@ -1,8 +1,11 @@
-import sqlite3
 import zlib
+
+import sqlite3
+from sqlite3.dbapi2 import Connection
 
 
 class DbManager:
+    conn: Connection
 
     def __init__(self):
         try:
@@ -13,7 +16,7 @@ class DbManager:
         except sqlite3.Error as error:
             print("Error occurred on initialisation - ", error)
 
-    def setup_db(self):
+    def setup_db(self) -> None:
         create_stats_table = '''CREATE TABLE game_stats(
                             game_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             score INTEGER,
@@ -25,14 +28,13 @@ class DbManager:
                             num_steps INTEGER)'''
         self.cursor.execute(create_stats_table)
 
-    def save_game(self, score, time_alive, inputs, steps):
+    def save_game(self, score: int, time_alive, inputs, steps):
         """
         Insert the stats from a game into the DB.
         :param score: Number of apples the snake ate
         :param time_alive: Time in millisec. the snake was alive
         :param inputs: Numpy array with the inputs
         :param steps:
-        :return:
         """
 
     def close_connection(self):
