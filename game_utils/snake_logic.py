@@ -4,11 +4,10 @@ from game_utils.direction import is_opposite_dir
 
 class SnakeLogic:
     default_direction = config.SNAKE_DEFAULT_DIRECTION
-    starting_position = config.SNAKE_STARTING_POSITION
 
-    def __init__(self):
+    def __init__(self, starting_position):
         # copies the list, so the one from config is not modified when modifying body
-        self.body = list(self.starting_position)
+        self.body = list(starting_position)
         self.direction = self.default_direction
         self.new_direction = self.default_direction
         self.next_new_direction = self.default_direction
@@ -18,10 +17,8 @@ class SnakeLogic:
             if not is_opposite_dir(self.direction, direction):
                 self.next_new_direction = self.new_direction = direction
         else:
-            print("a")
             if not is_opposite_dir(self.new_direction, direction):
                 self.next_new_direction = direction
-                print("b")
 
     def get_head(self):
         return self.body[0]
