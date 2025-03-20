@@ -3,11 +3,11 @@ import pygame
 import config
 import ai.ai_config as ai_config
 from gui import GUI
-from game_utils.food_logic import FoodLogic
+from game.game_objects.food_logic import FoodLogic
 from sprites.food_sprite import FoodSprite
-from game_utils.snake_logic import SnakeLogic
+from game.game_objects.snake_logic import SnakeLogic
 from sprites.snake_sprite import SnakeSprite
-from game_utils.direction import Direction
+from game.game_objects.direction import Direction
 
 class GameAI:
 
