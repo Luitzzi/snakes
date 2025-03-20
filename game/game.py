@@ -1,12 +1,12 @@
 import pygame
 
 import config
-from game_utils.snake_logic import SnakeLogic
-from game_utils.direction import Direction
-from game_utils.game_states import GameStates
-from game_utils.food_logic import FoodLogic
-from sprites.food_sprite import FoodSprite
-from sprites.snake_sprite import SnakeSprite
+from gui.gui import Gui
+from defs import Collision, Direction
+from game.food_logic import FoodLogic
+from game.game_states import GameStates
+from game.snake_logic import SnakeLogic
+from gui.drawers.snake_drawer import calc_direction
 
 
 class Game:
@@ -17,22 +17,25 @@ class Game:
     - Game states: game_active, game_over, TODO Landing Page
     """
 
-    def __init__(self):
-        self.screen = pygame.display.set_mode(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
-        )
+    def __init__(self, field_width, field_height):
+        self.field_size = (field_width, field_height)
+        # Setup game logic
         self.clock = pygame.time.Clock()
         self.game_running = True
         self.game_state = GameStates.title_screen
         self.start_time = None
 
-        self.snake_logic = SnakeLogic()
-        self.snake_sprite = SnakeSprite(self.snake_logic)
-        self.food_logic = FoodLogic()
-        self.food_sprite = FoodSprite(self.food_logic)
+        # Setup game elements
+        self.snake_starting_position = Game.calc_starting_position(
+            self.field_size[0], self.field_size[1]
+        )
+        self.snake_logic = SnakeLogic(self.snake_starting_position)
+        self.food_logic = FoodLogic(
+            self.snake_starting_position, self.field_size[0], self.field_size[1]
+        )
+        self.gui = Gui(self)
 
     def run(self):
-        self.screen.fill(config.BG_COLOR)
         self.start_time = pygame.time.get_ticks()
         while self.game_running:
             self._handle_events()  # Always necessary for the QUIT event
@@ -45,6 +48,8 @@ class Game:
                 self.__game_active_logic()
             elif self.game_state == GameStates.game_over:
                 self.__game_over_logic()
+
+            self.gui.draw()
         pygame.quit()
 
     #########
@@ -53,19 +58,17 @@ class Game:
 
     def __title_screen_logic(self):
         self.game_state = GameStates.game_active
-        self.start_time = pygame.time.get_ticks()  # Necessary to evaluate the score
+        self.start_time = (
+            pygame.time.get_ticks()
+        )  # Necessary after the change to game_active to evaluate the score
 
     def __game_active_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
         self._update_state()
-        self._draw()
-        pygame.display.flip()
+        self._draw_field_objects()
         self.clock.tick(config.FPS)
 
     def __game_over_logic(self):
-        pygame.draw.rect(self.screen, config.FIELD_COLOR, config.FIELD_RECT)
-        self._draw()
-        pygame.display.flip()
+        self._draw_field_objects()
         self.clock.tick(config.FPS)
 
     #########
@@ -106,7 +109,8 @@ class Game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
                 # Restart the game
-                self.snake_sprite.snake_logic = self.snake_logic = SnakeLogic()
+                self.snake_logic = SnakeLogic(self.snake_starting_position)
+                self.gui.game_restarted()
                 self.game_state = GameStates.game_active
             elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
                 self.game_running = False
@@ -123,43 +127,76 @@ class Game:
         - Check if snake eats
         """
         new_head = self.snake_logic.move()
+        old_tail = self._handle_eating()
         if self._is_collision(new_head):
             self.game_state = GameStates.game_over
-        self._handle_eating()
+            # moving snake back when hitting wall, so it does not clip into wall
+            if self.snake_logic.collided_with not in (
+                Collision.TAIL,
+                Collision.BODY,
+                Collision.CURVE,
+            ):
+                self.snake_logic.body.pop(0)
+                self.snake_logic.body.append(old_tail)
 
     def _is_collision(self, new_head):
         """
         Check if the new_head results in a collision.
+        Also passes collision information to SnakeLogic.
         The parameter is necessary to get the danger-moves in the training of the ai.
         :param new_head: position of the new head
         :return: bool: True if collision occurred, False if not
         """
-        if (
-            new_head in self.snake_logic.body[1:]
-            or new_head[0] < 0
-            or new_head[0] >= config.WIDTH
-            or new_head[1] < 0
-            or new_head[1] >= config.HEIGHT
-        ):
-            print("collision")
-            return True
+        if new_head in self.snake_logic.body[1:]:
+            if new_head == self.snake_logic.body[-1]:
+                self.snake_logic.collide(Collision.TAIL)
+            else:
+                i = self.snake_logic.body[1:].index(new_head) + 1
+                first_dir = calc_direction(
+                    self.snake_logic.body[i - 1], self.snake_logic.body[i]
+                )
+                second_dir = calc_direction(
+                    self.snake_logic.body[i], self.snake_logic.body[i + 1]
+                )
+                if first_dir == second_dir:
+                    self.snake_logic.collide(Collision.BODY)
+                else:
+                    self.snake_logic.collide(Collision.CURVE)
+        elif new_head[0] < 0:
+            self.snake_logic.collide(Collision.LEFT)
+        elif new_head[0] >= self.field_size[0]:
+            self.snake_logic.collide(Collision.RIGHT)
+        elif new_head[1] < 0:
+            self.snake_logic.collide(Collision.TOP)
+        elif new_head[1] >= self.field_size[1]:
+            self.snake_logic.collide(Collision.BOTTOM)
         else:
             return False
+        return True
 
-    def _draw(self):
-        self.snake_sprite.draw(self.screen)
-        self.food_sprite.draw(self.screen)
+    def _draw_field_objects(self):
+        """
+        Draw all objects located on the field.
+        Snake, food.
+        """
 
     #########
     # Helper methods
     ########
 
+    def calc_starting_position(width, height):
+        x_pos = (width // 4, height // 2)
+        y_pos = (width // 4 - 1, height // 2)
+        return (x_pos, y_pos)
+
     def _handle_eating(self):
+        self.snake_logic.set_food_pos(self.food_logic.location)
         new_head = self.snake_logic.get_head()
         if new_head == self.food_logic.location:
             self.food_logic.respawn(self.snake_logic.body)
+            return None
         else:
-            self.snake_logic.body.pop()
+            return self.snake_logic.body.pop()
 
     def get_time_since_start(self):
         """

@@ -1,10 +1,10 @@
 import pygame
-from game_utils.game import Game
+from game.game import Game
 
 
 def main():
     pygame.init()
-    game = Game()
+    game = Game(12, 12)
     game.run()
 
 
