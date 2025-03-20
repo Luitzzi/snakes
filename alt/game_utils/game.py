@@ -2,10 +2,10 @@ import pygame
 
 import config
 from gui import GUI
-from game_utils.snake_logic import SnakeLogic
-from game_utils.direction import Direction
-from game_utils.game_states import GameStates
-from game_utils.food_logic import FoodLogic
+from game.game_objects.snake_logic import SnakeLogic
+from game.game_objects.direction import Direction
+from alt.game_utils.game_states import GameStates
+from game.game_objects.food_logic import FoodLogic
 from sprites.food_sprite import FoodSprite
 from sprites.snake_sprite import SnakeSprite
 
@@ -136,39 +136,6 @@ class Game:
     # Other game-loop methods
     ########
 
-    def _update_state(self):
-        """
-        Update the game-state:
-        - Make the move based on the direction saved in snake_logic
-        - Check if the move results in a collision
-        - Check if snake eats
-        """
-        self.snake_logic.move()
-
-        if self._is_collision():
-            self.game_state = GameStates.game_over
-            self.time_alive = self.get_time_alive()
-
-        self._handle_eating()
-
-    def _is_collision(self):
-        """
-        Check if the new_head results in a collision.
-        The parameter is necessary to get the danger-moves in the training of the AI.
-        :return: bool: True if collision occurred, False if not
-        """
-        new_head = self.snake_logic.get_head()
-        if (
-            new_head in self.snake_logic.body[1:]
-            or new_head[0] < 0
-            or new_head[0] >= self.gui.field_width
-            or new_head[1] < 0
-            or new_head[1] >= self.gui.field_height
-        ):
-            return True
-        else:
-            return False
-
     def _draw_field_objects(self):
         """
         Draw all objects located on the field.
@@ -181,21 +148,6 @@ class Game:
     # Helper methods
     ########
 
-    def _handle_eating(self):
-        new_head = self.snake_logic.get_head()
-        if new_head == self.food_logic.location:
-            self.food_logic.respawn(self.snake_logic.body)
-            self.score += 1
-        else:
-            self.snake_logic.body.pop()
 
-    def get_time_alive(self):
-        """
-        Returns how long the player is playing in the game_active state
-        :return: int representing the time in seconds
-        """
-        if self.time_alive is None:
-            return None
-        else:
-            running_time_millis = pygame.time.get_ticks() - self.time_alive
-            return running_time_millis // 1000
+
+

@@ -7,7 +7,7 @@ import numpy as np
 import ai.ai_config as ai_config
 from ai.model import LinearQnet
 from ai.trainer import QTrainer
-from game_utils.direction import Direction, add_position_tuples
+from game.game_objects.direction import Direction, add_position_tuples
 
 class Agent:
 

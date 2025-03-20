@@ -1,5 +1,5 @@
 import config
-from game_utils.direction import is_opposite_dir
+from game.game_objects.direction import is_opposite_dir
 
 
 class SnakeLogic:

@@ -1,5 +1,5 @@
 from pathlib import Path
-from game_utils.direction import Direction
+from game.game_objects.direction import Direction
 
 ####################
 # General settings #
