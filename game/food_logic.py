@@ -18,7 +18,11 @@ class FoodLogic:
             valid_location = self.__is_location_valid(new_location, snake_body)
         self.location = new_location
 
-    def __is_location_valid(self, new_location, snake_body):
+    def set_food_position(self, position):
+        self.location = position
+
+    @staticmethod
+    def __is_location_valid(new_location, snake_body):
         if new_location in snake_body:
             return False
         else:

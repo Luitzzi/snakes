@@ -1,8 +1,11 @@
 from pathlib import Path
 from defs import Direction
 
-# General settings
-FPS = 5
+####################
+# General settings #
+####################
+
+FPS = 50
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 SCREEN_RES = (600, 400)
@@ -28,3 +31,25 @@ PIXEL_FONT_PATH = ROOT_DIR / "assets" / "fonts" / "PixelifySans-VariableFont_wgh
 
 # Game starting position
 SNAKE_DEFAULT_DIRECTION = Direction.EAST
+
+
+def calc_starting_position(field_width, field_height):
+    return (
+        (field_width // 4, field_height // 2),
+        (field_width // 4 - 1, field_height // 2),
+    )
+
+
+#########
+# Paths #
+#########
+ROOT_DIR = Path(__file__).resolve().parent  # Gets the directory of the current script
+
+# Images
+TOMATO_IMAGE_PATH = ROOT_DIR / "assets" / "images" / "apple.png"
+
+# Fonts
+PIXEL_FONT_PATH = ROOT_DIR / "assets" / "fonts" / "PixelifySans-VariableFont_wght.ttf"
+
+# AI model
+SAVE_MODEL_PATH = ROOT_DIR / "ai" / "models"
