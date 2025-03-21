@@ -1,17 +1,20 @@
-from typing import Dict, List, Callable
+from typing import Dict, List, Callable, TypeVar
 
 import pygame
 
-from event_types import EventType
-from event_handlers.event_handler import EventHandler
+from event_handling.event_types import Event, GameQuitEvent, StartGameEvent, MovementEvent
+from defs import Direction
 
 class EventManager:
-    handlers: Dict[EventType, List[Callable]]
+    E = TypeVar("E", bound = Event)
+    EventHandler = Callable[[E], None] # Function/Method dealing with the input event.
+    handlers: Dict[type[Event], List[EventHandler]]
+    # Handlers are registered and build the connection between an event_type and the function handling the event.
 
     def __init__(self):
         self.handlers = {}
 
-    def register(self, event_type: EventType, handler: Callable[[],None]) -> None:
+    def register(self, event_type: type[E], handler: EventHandler[E]) -> None:
         """
         Subscribe a handler to a certain event_type.
         This links the event_type with the handler. With that the handler is called if event occurs.
@@ -22,7 +25,7 @@ class EventManager:
             self.handlers[event_type] = []
         self.handlers[event_type].append(handler)
 
-    def unregister(self, event_type: EventType, handler: Callable[[], None]) -> bool:
+    def unregister(self, event_type: type[E], handler: EventHandler[E]) -> bool:
         """
         Unsubscribe a handler from a certain event_type.
         :param event_type: Pygame event
@@ -37,13 +40,15 @@ class EventManager:
         else:
             return False
 
-    def dispatch(self, event_type: EventType) -> None:
+    def dispatch(self, event: Event) -> None:
         """
         Notify all observers of the event_type that the event occurred.
-        :param event_type: Pygame event
+        :param event: Pygame event
         """
-        for handler in self.handlers[event_type]:
-            handler(event_type)
+        event_type = type(event)
+        if event_type in self.handlers:
+            for handler in self.handlers[event_type]:
+                handler(event)
 
     def get_events(self):
         """
@@ -52,19 +57,19 @@ class EventManager:
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.dispatch(EventType.GAME_QUIT)
+                self.dispatch(GameQuitEvent())
 
             if event.type == pygame.KEYDOWN:
                 # Game running events
                 if event.key in (pygame.K_UP, pygame.K_w):
-                    self.dispatch(EventType.INPUT_EVENT.UP)
+                    self.dispatch(MovementEvent(Direction.NORTH))
                 elif event.key in (pygame.K_RIGHT, pygame.K_d):
-                    self.dispatch(EventType.INPUT_EVENT.RIGHT)
+                    self.dispatch(MovementEvent(Direction.EAST))
                 elif event.key in (pygame.K_DOWN, pygame.K_s):
-                    self.dispatch(EventType.INPUT_EVENT.DOWN)
+                    self.dispatch(MovementEvent(Direction.SOUTH))
                 elif event.key in (pygame.K_LEFT, pygame.K_a):
-                    self.dispatch(EventType.INPUT_EVENT.LEFT)
+                    self.dispatch(MovementEvent(Direction.WEST))
 
                 # Title screen events
                 elif event.key == pygame.K_SPACE:
-                    self.dispatch(EventType.START_GAME)
+                    self.dispatch(StartGameEvent())

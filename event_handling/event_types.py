@@ -1,10 +1,26 @@
-class InputEvent:
-    UP = "direction_north"
-    RIGHT = "direction_east"
-    DOWN = "direction_south"
-    LEFT = "direction_west"
+from defs import Direction
 
-class EventType:
-    GAME_QUIT = "game_quit"
-    START_GAME = "start_game"
-    INPUT_EVENT = InputEvent
+class Event:
+    """
+    Base class for all events.
+    """
+
+class GameQuitEvent(Event):
+    """
+    Event triggered to quit the game.
+    """
+
+class StartGameEvent(Event):
+    """
+    Event triggered to start a Playable instance.
+    """
+
+class MovementEvent(Event):
+    """
+    Event triggered when a user inputs a movement action.
+    Contains the new direction resulting from the input.
+    """
+    action: Direction
+
+    def __init__(self, action: Direction):
+        self.action = action

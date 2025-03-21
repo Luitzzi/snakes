@@ -4,7 +4,7 @@ import pygame
 
 import config
 from event_handling.event_manager import EventManager
-from event_handling.event_types import EventType
+from event_handling.event_types import EventType, GameQuitEvent
 from game.game_state import GameState
 from game.playable.playable import Playable
 from game.playable.singleplayer import Singleplayer
@@ -25,10 +25,11 @@ class GameManager:
     starting_position: tuple[int, int]
 
     @staticmethod
-    def quit_game() -> None:
+    def quit_game(event: GameQuitEvent) -> None:
         """
         Observer method registered at the event_handler for the event: GAME_QUIT.
         Once the event occurs it is triggered.
+        :param event_type: Necessary to fulfill the handler prototype.
         :return:
         ::
         """
@@ -39,7 +40,7 @@ class GameManager:
     def __init__(self, event_manager):
         self.game_state = GameState.TITLE_SCREEN
         self.event_manager = event_manager
-        self.event_manager.register(EventType.GAME_QUIT, self.quit_game())
+        self.event_manager.register(EventType.GAME_QUIT, self.quit_game)
 
         self.game = None
         self.field_size = (config.DEFAULT_FIELD_WIDTH, config.DEFAULT_FIELD_HEIGHT)

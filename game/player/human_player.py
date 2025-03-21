@@ -1,7 +1,6 @@
 from typing import override
 
-import config
-from event_handling.event_types import EventType
+from event_handling.event_types import MovementEvent
 from game.game_objects.direction import Direction
 from game.game_objects.snake_logic import SnakeLogic
 from game.player.player import Player
@@ -31,24 +30,24 @@ class HumanPlayer(Player):
         if self.is_alive:
             self.snake_logic.move()
 
-    def player_input_handler(self, event_type: EventType) -> None:
+    def player_input_handler(self, event: MovementEvent) -> None:
         """
         Observer method registered at the event_handler for the event: INPUT_EVENT.
         Once any INPUT_EVENT such as w,a,s,d or the arrow-keys are pressed
         and the game_manager.game_state = PLAYING the method is triggered.
-        :param event_type: INPUT_EVENT - w,a,s,d, arrow-keys
+        :param event: INPUT_EVENT - w,a,s,d, arrow-keys
         :return:
         """
-        match event_type:
-            case EventType.INPUT_EVENT.UP:
+        match event.action:
+            case Direction.NORTH:
                 if self.snake_logic.direction != Direction.SOUTH:
                     self.snake_logic.direction = Direction.NORTH
-            case EventType.INPUT_EVENT.RIGHT:
+            case Direction.EAST:
                 if self.snake_logic.direction != Direction.WEST:
                     self.snake_logic.direction = Direction.EAST
-            case EventType.INPUT_EVENT.DOWN:
+            case Direction.SOUTH:
                 if self.snake_logic.direction != Direction.NORTH:
                     self.snake_logic.direction = Direction.SOUTH
-            case EventType.INPUT_EVENT.LEFT:
+            case Direction.WEST:
                 if self.snake_logic.direction != Direction.EAST:
                     self.snake_logic.direction = Direction.WEST

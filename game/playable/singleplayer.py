@@ -6,7 +6,7 @@ from game.game_objects.food_logic import FoodLogic
 from game.game_state import GameState
 from game.playable.playable import Playable
 from game.player.player import Player
-from game.player.humanplayer import HumanPlayer
+from game.player.human_player import HumanPlayer
 
 class Singleplayer(Playable):
     """
