@@ -6,7 +6,7 @@ from game.game_objects.food_logic import FoodLogic
 from game.game_state import GameState
 from game.playable.playable import Playable
 from game.player.player import Player
-from game.player.human import Human
+from game.player.humanplayer import HumanPlayer
 
 class Singleplayer(Playable):
     """
@@ -19,7 +19,7 @@ class Singleplayer(Playable):
     time_alive: int
     score: int
 
-    player: Human
+    player: HumanPlayer
     enemies: List[Player]
     field_size: tuple[int, int]
     food_logic: FoodLogic

@@ -7,7 +7,7 @@ from game.game_objects.snake_logic import SnakeLogic
 from game.player.player import Player
 
 
-class Human(Player):
+class HumanPlayer(Player):
     color: None
     snake_logic: SnakeLogic
 

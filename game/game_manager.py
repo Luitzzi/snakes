@@ -5,12 +5,13 @@ import pygame
 import config
 from event_handling.event_manager import EventManager
 from event_handling.event_types import EventType
-from game.game_objects.snake_logic import SnakeLogic
 from game.game_state import GameState
 from game.playable.playable import Playable
 from game.playable.singleplayer import Singleplayer
 from game.player.player import Player
-from game.player.human import Human
+from game.player.player_factory import PlayerFactory
+from game.player.player_type import PlayerType
+
 
 class GameManager:
     """
@@ -92,7 +93,8 @@ class GameManager:
         ::
         """
         # Currently: Just directly start a game until we implemented a title_screen
-        self.start_game(Human("blue", SnakeLogic(self.starting_position)),[])
+        real_player = PlayerFactory.create_player(PlayerType.HUMAN_PLAYER, 1, self.starting_position)
+        self.start_game(real_player)
 
     def handle_game_over_screen(self):
         """
