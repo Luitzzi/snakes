@@ -14,11 +14,11 @@ Welcome to the ULTIMATE SNAKES GAME - feature rich with modern AI-Technology
 ## Features
 - **Beautiful self pixeled snake animations** <br />
     It wiggles, eats and bumps his head.
-- **Train your own AI!**<br /> 
+- **Train your own AI**<br /> 
     Special mode where you can train an AI using reinforcement learning
     with experience replay on your OWN computer!
 - **Overview and replay over previous runs** <br />
-    Look through all your old runs sorted by their score or playtime and replay the most interesting ones!
+    Look through all your old runs sorted by their score or playtime and replay the most interesting ones
 - **Framework for Game-modes and Players** <br />
     Clear structure for game-modes and players allowing simple game extensions.
 
