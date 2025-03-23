@@ -25,29 +25,29 @@ Welcome to the ULTIMATE SNAKES GAME - feature rich with modern AI-Technology
 ![Gif presenting a complete game](/assets/images/complete_game.gif)
 
 ## What did we learn?
-- **Clean, structured and easily expandable Code** <br />
+* **Clean, structured and easily expandable Code** <br />
     Using OOP we implemented a well-defined structure of the different game aspects. <br />
     The GUI, Game and AI-logic is clearly separated. The different game-states are managed by the 
     class GameManager calling the methods corresponding to the current state. <br />
 <br />
-  - **Easy expandable game-modes and player-agents using the Strategy-Pattern** <br />
+  * **Easy expandable game-modes and player-agents using the Strategy-Pattern** <br />
       Game-modes such as Singleplayer, Replay etc. all implement the 'Interface' Playable.
       Players are defined by a Strategy Interface as well and are dynamically created based on the user-input at runtime
       using the Factory Pattern. This ensures consistency and enables easy expansions. <br />
   <br />
-  - **Well-defined event-handling using the EventManager class as an observer** <br />
+  * **Well-defined event-handling using the EventManager class as an observer** <br />
       Classes dealing with events register their event-handler method at the EventManager. 
       Once the event occurs the EventManagers notifies all methods handling with the specific event.
       Following this Strategy the event-logic is mostly encapsulated inside the EventManager class and only the
       methods handling with the event are defined outside providing also a separation of concerns in this area. <br />
   <br />
-- **Save game statistics and replay data in a sqlite3 database** <br />
+* **Save game statistics and replay data in a sqlite3 database** <br />
     During the game the step data and food positions are saved inside two numpy arrays ensuring performance.
     Afterwards the whole arrays are combined in an BLOB and loaded inside the database with the remaining game stats.
     To replay a game the game-steps are executed on the playable 'Replay' and when the snake eats the index of the
     food position array is incremented. <br />
 <br />
-- **Good communication and project planing with GitHub Projects** <br />
+* **Good communication and project planing with GitHub Projects** <br />
     To try out GitHub projects and have a fast overview of the current state of the project we implemented a GitHub-Projects
     page seperated into different task stages. <br />
     Snapshot of the Kanban Board: [GitHub Projects page](assets/images/github_projects_snapshot.png)
