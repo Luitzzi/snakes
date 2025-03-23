@@ -49,7 +49,7 @@ Welcome to the ULTIMATE SNAKES GAME - feature rich with modern AI-Technology
     Snapshot of the Kanban Board: [GitHub Projects page](assets/images/github_projects_snapshot.png)
 
 ## Install
-1. Install Prerequisites into a virtual environment
+1. Install Prerequisites into a virtual environment <br />
    Makefile:
    ```shell
    make venv
