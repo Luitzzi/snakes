@@ -17,7 +17,7 @@ Welcome to the ULTIMATE SNAKES GAME - feature rich with modern AI-Technology
 * **Train your own AI**<br /> 
     Special mode where you can train an AI using reinforcement learning
     with experience replay on your OWN computer!
-* **Overview and replay over previous runs** <br />
+* **Overview and replay of previous runs** <br />
     Look through all your old runs sorted by their score or playtime and replay the most interesting ones
 * **Framework for Game-modes and Players** <br />
     Clear structure for game-modes and players allowing simple game extensions.
@@ -35,7 +35,7 @@ Welcome to the ULTIMATE SNAKES GAME - feature rich with modern AI-Technology
         using the Factory Pattern. This ensures consistency and enables easy expansions. <br /> <br />
     * **Well-defined event-handling using the EventManager class as an observer** <br />
         Classes dealing with events register their event-handler method at the EventManager. 
-        Once the event occurs the EventManagers notifies all methods handling with the specific event.
+        Once the event occurs the EventManager notifies all methods handling the specific event.
         Following this Strategy the event-logic is mostly encapsulated inside the EventManager class and only the
         methods handling with the event are defined outside providing also a separation of concerns in this area. <br /> <br />
 * **Save game statistics and replay data in a sqlite3 database** <br />
@@ -44,7 +44,7 @@ Welcome to the ULTIMATE SNAKES GAME - feature rich with modern AI-Technology
     To replay a game the game-steps are executed on the playable 'Replay' and when the snake eats the index of the
     food position array is incremented. <br /> <br />
 * **Good communication and project planing with GitHub Projects** <br />
-    To try out GitHub projects and have a fast overview of the current state of the project we implemented a GitHub-Projects
+    To try out GitHub projects and have a fast overview over the current state of the project we implemented a GitHub-Projects
     page seperated into different task stages. <br />
     Snapshot of the Kanban Board: [GitHub Projects page](assets/images/github_projects_snapshot.png)
 
